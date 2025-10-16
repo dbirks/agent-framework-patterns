@@ -13,9 +13,7 @@ import random
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
 
 # Create an agent with a system prompt
