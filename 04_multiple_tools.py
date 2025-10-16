@@ -4,7 +4,7 @@
 # dependencies = [
 #   "pydantic-ai==1.1.0",
 #   "python-dotenv==1.1.1",
-#   "logfire==2.11.0",
+#   "logfire==4.13.2",
 # ]
 # ///
 
@@ -15,9 +15,7 @@ import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
 
 # Configure Logfire for local development (no cloud sending)
