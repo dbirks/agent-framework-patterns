@@ -21,7 +21,12 @@ from textwrap import dedent
 import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
 from rich.prompt import Prompt
+
+console = Console()
 
 load_dotenv(override=True)
 model = os.getenv("MODEL")
@@ -34,27 +39,26 @@ agent = Agent(
         """
         You're a travel planning assistant. Ask the user questions to learn about
         their travel preferences, then provide personalized recommendations.
-        Remember all details from the conversation.
         """
     ).strip(),
 )
 
-print("Travel Planning Assistant\n")
+console.print("\n[bold cyan]Travel Planning Assistant[/bold cyan]\n")
 
 # Start the conversation - let the agent initiate
 result = agent.run_sync("Start helping me plan a trip.")
-print(f"Assistant: {result.output}\n")
+console.print(Panel(Markdown(result.output), title="Assistant", border_style="green"))
 
 message_history = result.new_messages()
 
 # Interactive conversation loop
 while True:
-    user_input = Prompt.ask("You")
+    user_input = Prompt.ask("\n[bold blue]You[/bold blue]")
 
     if user_input.lower() in ["exit", "quit", "done"]:
         break
 
     result = agent.run_sync(user_input, message_history=message_history)
-    print(f"Assistant: {result.output}\n")
+    console.print(Panel(Markdown(result.output), title="Assistant", border_style="green"))
 
     message_history = result.new_messages()
