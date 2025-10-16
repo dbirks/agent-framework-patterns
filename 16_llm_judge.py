@@ -44,6 +44,7 @@ class LinkedInJudgment(BaseModel):
 writer_agent = Agent(
     model,
     system_prompt="You write LinkedIn posts about professional updates and achievements.",
+    instrument=True,
 )
 
 judge_agent = Agent(
@@ -59,6 +60,7 @@ judge_agent = Agent(
         Only approve if ALL criteria are met. Be specific in feedback about what's missing.
         """
     ).strip(),
+    instrument=True,
 )
 
 console.print("\n[bold cyan]LinkedIn Post Generator with LLM Judge[/bold cyan]\n")
@@ -66,21 +68,32 @@ console.print("\n[bold cyan]LinkedIn Post Generator with LLM Judge[/bold cyan]\n
 topic = "Write a post about getting promoted to senior engineer"
 max_attempts = 3
 
+logfire.info(f"Starting LinkedIn post generation with {max_attempts} max attempts")
+
 for attempt in range(1, max_attempts + 1):
+    logfire.info(f"Attempt {attempt}/{max_attempts}")
     console.print(f"[bold yellow]Attempt {attempt}/{max_attempts}[/bold yellow]\n")
 
     if attempt == 1:
         prompt = topic
     else:
         prompt = f"{topic}\n\nPrevious attempt was rejected. Improve it based on this feedback:\n{feedback}"
+        logfire.info(f"Using feedback from previous attempt: {feedback}")
 
+    logfire.info("Generating post with writer agent")
     result = writer_agent.run_sync(prompt)
     post = result.output
 
     console.print(Panel(Markdown(post), title=f"Draft {attempt}", border_style="blue"))
 
+    logfire.info("Evaluating post with judge agent")
     judge_result = judge_agent.run_sync(f"Evaluate this LinkedIn post:\n\n{post}")
     judgment = judge_result.output
+
+    logfire.info(
+        f"Judge verdict: approved={judgment.approved}, emojis={judgment.emoji_count}, "
+        f"humble_brag={judgment.has_humble_brag}, superlatives={judgment.has_superlatives}"
+    )
 
     status = "✅ APPROVED" if judgment.approved else "❌ REJECTED"
     judge_output = f"""
@@ -99,10 +112,13 @@ for attempt in range(1, max_attempts + 1):
     )
 
     if judgment.approved:
+        logfire.info(f"Post approved after {attempt} attempt(s)")
         console.print(f"\n[bold green]Post approved after {attempt} attempt(s)![/bold green]\n")
         break
 
+    logfire.warn(f"Post rejected on attempt {attempt}: {judgment.feedback}")
     feedback = judgment.feedback
     console.print()
 else:
+    logfire.error(f"Failed to meet criteria after {max_attempts} attempts")
     console.print(f"\n[bold red]Failed to meet criteria after {max_attempts} attempts[/bold red]\n")
