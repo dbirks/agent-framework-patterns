@@ -10,8 +10,7 @@
 """
 MCP Server Integration
 
-Demonstrates connecting to an MCP server (Kubernetes) and letting the agent
-use the server's tools to query cluster resources and report findings.
+Demonstrates connecting to an MCP server for Kubernetes and letting the agent use the tools.
 """
 
 import os
