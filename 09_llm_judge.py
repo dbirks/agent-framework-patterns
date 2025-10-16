@@ -51,8 +51,8 @@ judge_agent = Agent(
         """
         You're a LinkedIn content validator. Posts must have ALL of these:
         - At least 10 emojis
-        - At least 3 humble brag phrases (like "thrilled", "honored", "grateful", "humbled")
-        - At least 3 superlatives (like "amazing", "incredible", "fantastic", "awesome")
+        - At least 3 humble brag phrases
+        - At least 3 superlatives
 
         Count each criterion carefully. Only approve if ALL criteria are met.
         Be specific in feedback about what's missing or what was good.
@@ -88,16 +88,18 @@ def validate_with_judge(post: str) -> str:
 
     # Display judgment in console
     status = "✅ APPROVED" if judgment.approved else "❌ REJECTED"
-    judge_output = f"""
-**Status:** {status}
+    judge_output = dedent(
+        f"""
+        **Status:** {status}
 
-**Metrics:**
-- Emojis: {judgment.emoji_count}/10
-- Humble Brags: {judgment.humble_brag_count}/3
-- Superlatives: {judgment.superlatives_count}/3
+        **Metrics:**
+        - Emojis: {judgment.emoji_count}/10
+        - Humble Brags: {judgment.humble_brag_count}/3
+        - Superlatives: {judgment.superlatives_count}/3
 
-**Feedback:** {judgment.feedback}
-"""
+        **Feedback:** {judgment.feedback}
+        """
+    ).strip()
 
     console.print(
         Panel(
