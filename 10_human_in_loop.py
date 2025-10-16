@@ -85,7 +85,8 @@ logfire.info("Starting negotiation")
 
 # Get seller's opening offer
 seller_response = seller_agent.run_sync("Make your opening pitch to sell your goats.")
-logfire.info(f"Seller opened: {seller_response.output[:100]}")
+
+console.print(Panel(Markdown(seller_response.output), title="Seller's Opening Pitch", border_style="red"))
 
 conversation_history = f"Seller said: {seller_response.output}"
 
