@@ -15,6 +15,7 @@ reducing hallucination. Shows how to integrate external knowledge sources with L
 """
 
 import os
+from textwrap import dedent
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent
@@ -85,9 +86,13 @@ KNOWLEDGE_BASE = [
 # Create a RAG agent
 agent = Agent(
     model,
-    system_prompt="""You're a helpful PydanticAI documentation assistant.
-When answering questions, always search the knowledge base first to provide accurate information.
-If you find relevant documentation, cite it in your answer. If no relevant docs are found, say so.""",
+    system_prompt=dedent(
+        """
+        You're a helpful PydanticAI documentation assistant.
+        When answering questions, always search the knowledge base first to provide accurate information.
+        If you find relevant documentation, cite it in your answer. If no relevant docs are found, say so.
+        """
+    ).strip(),
 )
 
 

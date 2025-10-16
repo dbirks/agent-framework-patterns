@@ -18,6 +18,7 @@ Shows how to combine type-safe outputs with professional data presentation.
 """
 
 import os
+from textwrap import dedent
 
 import httpx
 import logfire
@@ -32,10 +33,7 @@ load_dotenv(override=True)
 
 model = os.getenv("MODEL")
 
-# Configure Logfire for local development (no cloud sending)
 logfire.configure(send_to_logfire=False)
-
-# Instrument PydanticAI to track all agent operations
 logfire.instrument_pydantic_ai()
 
 
@@ -63,9 +61,13 @@ class WeatherReport(BaseModel):
 agent = Agent(
     model,
     output_type=WeatherReport,
-    system_prompt="""You're a global weather assistant that fetches real-time weather data for multiple cities.
-When asked about weather, use the get_weather tool to fetch data for major cities around the world.
-Return structured data for all cities in the WeatherReport format.""",
+    system_prompt=dedent(
+        """
+        You're a global weather assistant that fetches real-time weather data for multiple cities.
+        When asked about weather, use the get_weather tool to fetch data for major cities around the world.
+        Return structured data for all cities in the WeatherReport format.
+        """
+    ).strip(),
     instrument=True,
 )
 
@@ -119,11 +121,15 @@ print("=" * 70)
 print()
 
 result = agent.run_sync(
-    """Get the current weather for these locations around the world:
-    New York, London, Tokyo, Sydney, Paris, Dubai, São Paulo, Cairo (Egypt),
-    Beijing (China), Moscow (Russia), Portland (Oregon), Mexico City, and
-    McMurdo Station (Antarctica).
-    Fetch weather for all of them."""
+    dedent(
+        """
+        Get the current weather for these locations around the world:
+        New York, London, Tokyo, Sydney, Paris, Dubai, São Paulo, Cairo (Egypt),
+        Beijing (China), Moscow (Russia), Portland (Oregon), Mexico City, and
+        McMurdo Station (Antarctica).
+        Fetch weather for all of them.
+        """
+    ).strip()
 )
 
 weather_report: WeatherReport = result.output

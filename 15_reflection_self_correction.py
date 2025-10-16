@@ -15,6 +15,7 @@ Useful for tasks requiring high quality output or multiple revision cycles.
 """
 
 import os
+from textwrap import dedent
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field

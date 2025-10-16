@@ -15,6 +15,7 @@ their viewpoints into a balanced decision. Reduces bias and produces well-rounde
 """
 
 import os
+from textwrap import dedent
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
@@ -38,31 +39,47 @@ class Decision(BaseModel):
 # Create agents with different perspectives
 optimist_agent = Agent(
     model,
-    system_prompt="""You're an optimistic strategist who focuses on opportunities and benefits.
-Your role is to advocate for progress and innovation, highlighting potential gains and positive outcomes.
-Be enthusiastic but still rational. Provide specific examples of benefits.""",
+    system_prompt=dedent(
+        """
+        You're an optimistic strategist who focuses on opportunities and benefits.
+        Your role is to advocate for progress and innovation, highlighting potential gains and positive outcomes.
+        Be enthusiastic but still rational. Provide specific examples of benefits.
+        """
+    ).strip(),
 )
 
 pessimist_agent = Agent(
     model,
-    system_prompt="""You're a risk-focused analyst who identifies potential problems and challenges.
-Your role is to ensure thorough consideration of downsides, risks, and obstacles.
-Be critical but constructive. Provide specific examples of risks.""",
+    system_prompt=dedent(
+        """
+        You're a risk-focused analyst who identifies potential problems and challenges.
+        Your role is to ensure thorough consideration of downsides, risks, and obstacles.
+        Be critical but constructive. Provide specific examples of risks.
+        """
+    ).strip(),
 )
 
 pragmatist_agent = Agent(
     model,
-    system_prompt="""You're a pragmatic consultant who focuses on practical implementation.
-Your role is to consider feasibility, costs, resources, and real-world constraints.
-Be balanced and focus on what's actually achievable. Provide specific practical considerations.""",
+    system_prompt=dedent(
+        """
+        You're a pragmatic consultant who focuses on practical implementation.
+        Your role is to consider feasibility, costs, resources, and real-world constraints.
+        Be balanced and focus on what's actually achievable. Provide specific practical considerations.
+        """
+    ).strip(),
 )
 
 judge_agent = Agent(
     model,
     output_type=Decision,
-    system_prompt="""You're an impartial decision-maker who synthesizes multiple perspectives.
-Evaluate all arguments fairly and provide a balanced final recommendation.
-Consider benefits, risks, and practical constraints. Your decision should be well-reasoned and actionable.""",
+    system_prompt=dedent(
+        """
+        You're an impartial decision-maker who synthesizes multiple perspectives.
+        Evaluate all arguments fairly and provide a balanced final recommendation.
+        Consider benefits, risks, and practical constraints. Your decision should be well-reasoned and actionable.
+        """
+    ).strip(),
 )
 
 
