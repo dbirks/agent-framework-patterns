@@ -46,7 +46,7 @@ def get_weather(city: str) -> str:
     """Fetch current temperature for a specific city from wttr.in API."""
     try:
         url = f"https://wttr.in/{city}?format=j1"
-        logfire.info("Fetching weather", city=city)
+        logfire.info(f"Fetching weather for {city}")
 
         with httpx.Client(timeout=10.0) as client:
             response = client.get(url)
@@ -57,11 +57,11 @@ def get_weather(city: str) -> str:
         temp_f = current["temp_F"]
 
         result = f"{city} is currently {temp_f}°F"
-        logfire.info("Weather retrieved", city=city, temp_f=temp_f)
+        logfire.info(f"Weather retrieved: {city} = {temp_f}°F")
         return result
 
     except Exception as e:
-        logfire.error("Weather fetch failed", city=city, error=str(e))
+        logfire.error(f"Weather fetch failed for {city}: {e}")
         return f"Unable to fetch weather for {city}"
 
 
