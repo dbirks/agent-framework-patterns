@@ -65,7 +65,7 @@ judge_agent = Agent(
 writer_agent = Agent(
     model,
     system_prompt="You write LinkedIn posts about professional updates and achievements.",
-    retries=3,
+    output_retries=10,
     instrument=True,
 )
 
