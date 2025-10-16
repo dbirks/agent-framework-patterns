@@ -96,9 +96,8 @@ print("🔧 Multiple Tool Calls Demo")
 print("=" * 70)
 print()
 
-query = """What's the weather in New York and London right now?
-Also, if New York is at 72°F, what's that in Celsius?
-And how do these two cities compare in terms of population?"""
+query = """What's the temperature in Tokyo and Sydney right now?
+Also convert 75°F to Celsius, and tell me what timezone London is in."""
 
 print(f"👤 User: {query}")
 print()
@@ -111,8 +110,8 @@ print("=" * 70)
 print(f"🤖 Agent Response:\n\n{result.output}")
 print()
 print("=" * 70)
-print("✅ The agent called multiple tools:")
-print("   • get_weather() - for New York and London")
-print("   • convert_temperature() - for Fahrenheit to Celsius conversion")
-print("   • compare_cities() - for population comparison")
-print("✅ Check Logfire output above to see the tool call traces")
+print("✅ The agent called multiple tools to gather this information:")
+print("   • get_weather() - fetched temperature for cities")
+print("   • convert_temperature() - converted Fahrenheit to Celsius")
+print("   • get_timezone() - looked up timezone information")
+print("✅ Check Logfire output above to see each tool call traced")
