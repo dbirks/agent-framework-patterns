@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # /// script
-# requires-python = ">=3.14"
+# requires-python = ">=3.14,<3.15"
 # dependencies = [
-#     "pydantic-ai",
+#     "pydantic-ai==1.1.0",
 # ]
 # ///
 
