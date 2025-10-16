@@ -59,29 +59,29 @@ uv run 01_hello.py
 
 ## Scripts
 
-### [`01_hello.py`](01_hello.py) - Simple Agent
-The most basic example. Creates an agent that answers a single question with one sentence.
+### [`01_hello.py`](01_hello.py) - Hello world
+Creates an agent that answers a single question with one sentence.
 
-### [`02_tool_call.py`](02_tool_call.py) - Tool Definition
+### [`02_tool_call.py`](02_tool_call.py) - Using tools
 Shows how to define custom tools with `@agent.tool_plain`. Agent uses a dice rolling tool to generate random numbers.
 
-### [`03_multiple_tool_calls.py`](03_multiple_tool_calls.py) - Multiple Tools with Logfire
+### [`03_multiple_tool_calls.py`](03_multiple_tool_calls.py) - Multiple tool calls
 Agent calls a weather API tool multiple times to compare temperatures across Tokyo, Sydney, and London. Includes Logfire observability for tracking tool calls.
 
-### [`04_structured_outputs.py`](04_structured_outputs.py) - Structured Outputs with Rich Tables
-Agent fetches weather data for 13 cities worldwide and returns a typed `WeatherReport` object, displayed in a Rich table. Shows type-safe outputs with `Agent[None, OutputType]` syntax.
+### [`04_structured_outputs.py`](04_structured_outputs.py) - Structured Outputs
+Agent fetches weather data for 13 cities worldwide and returns a typed response, displayed in a table.
 
-### [`05_multi_agent.py`](05_multi_agent.py) - Agent Composition
+### [`05_multi_agent.py`](05_multi_agent.py) - Agents calling other agents
 A coordinator agent delegates to two specialized sub-agents: a research agent that searches DuckDuckGo for quantum computing information, and a writing agent that transforms findings into prose.
 
-### [`06_using_mcp_tools.py`](06_using_mcp_tools.py) - MCP Server Integration
+### [`06_using_mcp_tools.py`](06_using_mcp_tools.py) - Using tools from a MCP Server
 Connects to a Kubernetes MCP server and uses its tools to check deployment status. Shows how to integrate external tool servers using Model Context Protocol.
 
-### [`07_conversation_history.py`](07_conversation_history.py) - Conversation History
+### [`07_conversation_history.py`](07_conversation_history.py) - Conversation history
 Interactive travel planning assistant that maintains context across multiple turns by passing `message_history` between runs. The agent asks questions and remembers your answers.
 
-### [`08_llm_as_judge.py`](08_llm_as_judge.py) - LLM as Judge Pattern
-A writer agent creates LinkedIn posts, and a judge agent (claude haiku) validates them against criteria. Uses `@agent.output_validator` for automatic retry loops.
+### [`08_llm_as_judge.py`](08_llm_as_judge.py) - LLM as Judge
+A writer agent creates LinkedIn posts, and a judge agent (Claude Haiku) validates them against criteria.
 
 ### [`09_human_in_the_loop.py`](09_human_in_the_loop.py) - Human-in-the-Loop
-Multi-agent goat negotiation where your negotiator agent works with you to buy goats from an unpredictable seller agent. You approve or modify each counteroffer before it's sent.
+Multi-agent goat negotiation where your negotiator agent works with you to buy goats from an unpredictable seller agent. The agents barter among themselves, but the human approves each final counteroffer before it's sent.
