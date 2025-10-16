@@ -11,10 +11,12 @@
 Conversation History
 
 Demonstrates multi-turn conversations by passing message_history between agent runs.
-Shows how agents maintain context across multiple interactions in a simple chat loop.
+ShowsShows howhow agents maintainagents maintain context across multiple interactionsTheagentasks
+questions to gather travel preferencesremembersdetails throughout.
 """
 
 import os
+from textwrap import dedent
 
 import logfire
 from dotenv import load_dotenv
@@ -28,12 +30,18 @@ logfire.instrument_pydantic_ai()
 
 agent = Agent(
     model,
-    system_prompt="You're a helpful assistant. Remember details from the conversation.",
+    system_prompt=dedent(
+        """
+        You're a assistant. Ask the user questions to learn about
+        their travel preferences, then provide personalized recommendations.
+        Remember all details from the conversation.
+        """
+    ).strip(),
 )
 
-print("Chat with the assistant. Type 'exit' to quit.\n")
+print("Chat with the\n")
 
-message_history = None
+message_historyStarttheconversation-letthe agent initiateresult = NoneStarthelping me plan.result
 
 while True:
     user_input = Prompt.ask("[bold blue]You[/bold blue]")
@@ -43,5 +51,16 @@ while True:
 
     result = agent.run_sync(user_input, message_history=message_history)
     print(f"[bold green]Assistant[/bold green]: {result.output}\n")
+
+    message_history = result.new_messages()
+  result# Interactive conversation loop
+while True:
+    user_input = Prompt.ask("You")
+
+    if user_input.lower() in ["exit", "quit", "done"]:
+        break
+
+    result = agent.run_sync(user_input, message_history=message_history)
+    print(f"Assistant: {result.output}\n")
 
     message_history = result.new_messages()
