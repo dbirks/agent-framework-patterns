@@ -135,7 +135,9 @@ while True:
                 """
             ).strip()
         )
-        logfire.info(f"Negotiator says: {negotiator_response.output[:100]}")
+        console.print(
+            Panel(Markdown(negotiator_response.output), title=f"You (Round {round_num + 1})", border_style="blue")
+        )
 
         conversation_history += f"\n\nYou: {negotiator_response.output}"
 
@@ -153,14 +155,10 @@ while True:
             ).strip()
         )
 
-        logfire.info(f"Seller responds: {seller_response.output[:100]}")
+        console.print(
+            Panel(Markdown(seller_response.output), title=f"Seller (Round {round_num + 1})", border_style="red")
+        )
+
         conversation_history += f"\n\nSeller: {seller_response.output}"
 
-    # After negotiation rounds, show update
-    console.print(
-        Panel(
-            Markdown(f"**Latest from seller:**\n\n{seller_response.output}"),
-            title="Seller's Response",
-            border_style="red",
-        )
-    )
+    console.print()
