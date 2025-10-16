@@ -29,20 +29,18 @@ model = os.getenv("MODEL")
 logfire.configure(send_to_logfire=False)
 logfire.instrument_pydantic_ai()
 
-DEPLOYMENTS = ["ai-data-collector-api", "ai-data-collector-ui"]
-
 
 async def main():
-    kubernetes_mcp_serve = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@0.0.53"], timeout=30)
+    kubernetes_mcp_server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@0.0.53"], timeout=30)
 
     agent = Agent(
         model,
-        toolsets=[server],
+        toolsets=[kubernetes_mcp_server],
         system_prompt="You're a Kubernetes monitoring assistant. Check deployment status and report findings.",
     )
 
     async with agent:
-        result = await agent.run(f"Check the status of these deployments: {', '.join(DEPLOYMENTS)}")
+        result = await agent.run("Check the status of ai-data-collector")
         print(result.output)
 
 
