@@ -70,8 +70,7 @@ print("🔧 Multiple Tool Calls Demo")
 print("=" * 70)
 print()
 
-query = """What's the temperature in Tokyo and Sydney right now?
-Also convert 75°F to Celsius, and tell me what timezone London is in."""
+query = "What's the temperature in Tokyo, Sydney, and London right now?"
 
 print(f"👤 User: {query}")
 print()
