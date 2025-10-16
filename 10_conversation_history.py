@@ -52,13 +52,16 @@ console.print(Panel(Markdown(result.output), title="Assistant", border_style="gr
 message_history = result.new_messages()
 
 # Interactive conversation loop
-while True:
-    user_input = Prompt.ask("\n[bold blue]You[/bold blue]")
+try:
+    while True:
+        user_input = Prompt.ask("\n[bold blue]You[/bold blue]")
 
-    if user_input.lower() in ["exit", "quit", "done"]:
-        break
+        if user_input.lower() in ["exit", "quit", "done"]:
+            break
 
-    result = agent.run_sync(user_input, message_history=message_history)
-    console.print(Panel(Markdown(result.output), title="Assistant", border_style="green"))
+        result = agent.run_sync(user_input, message_history=message_history)
+        console.print(Panel(Markdown(result.output), title="Assistant", border_style="green"))
 
-    message_history = result.new_messages()
+        message_history = result.new_messages()
+except KeyboardInterrupt:
+    console.print("\n[yellow]Goodbye![/yellow]")
