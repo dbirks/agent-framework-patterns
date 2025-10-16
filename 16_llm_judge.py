@@ -16,6 +16,7 @@ The judge enforces specific criteria and provides feedback for iterative improve
 
 import os
 from textwrap import dedent
+from typing import cast
 
 import logfire
 from dotenv import load_dotenv
@@ -67,6 +68,7 @@ console.print("\n[bold cyan]LinkedIn Post Generator with LLM Judge[/bold cyan]\n
 
 topic = "Write a post about getting promoted to senior engineer"
 max_attempts = 3
+feedback = ""
 
 logfire.info(f"Starting LinkedIn post generation with {max_attempts} max attempts")
 
@@ -88,7 +90,7 @@ for attempt in range(1, max_attempts + 1):
 
     logfire.info("Evaluating post with judge agent")
     judge_result = judge_agent.run_sync(f"Evaluate this LinkedIn post:\n\n{post}")
-    judgment = judge_result.output
+    judgment = cast(LinkedInJudgment, judge_result.output)
 
     logfire.info(
         f"Judge verdict: approved={judgment.approved}, emojis={judgment.emoji_count}, "

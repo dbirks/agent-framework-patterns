@@ -1,4 +1,6 @@
-# Coding agent instructions
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -41,6 +43,7 @@ The `.env.example` file contains an extensive list of available models across An
 - **Linting**: `uvx ruff check`
 - **Auto-fix**: `uvx ruff check --fix`
 - **Format**: `uvx ruff format`
+- **Type checking**: `uvx ty check <script.py>`
 
 Configuration in `.ruff.toml` with Python 3.14 target.
 
