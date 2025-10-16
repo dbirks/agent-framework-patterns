@@ -18,13 +18,16 @@ Shows how different models can be used for different specialized tasks.
 """
 
 import os
+from typing import cast
 
 import logfire
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.panel import Panel
 
 console = Console()
 
@@ -32,6 +35,11 @@ load_dotenv(override=True)
 model = os.getenv("MODEL")
 logfire.configure(send_to_logfire=False)
 logfire.instrument_pydantic_ai()
+
+
+class Article(BaseModel):
+    content: str = Field(description="The full article content in markdown format")
+
 
 # Create specialized sub-agents with specific models
 research_agent = Agent(
@@ -50,7 +58,8 @@ writing_agent = Agent(
 # Create main coordinator agent
 coordinator = Agent(
     "anthropic:claude-haiku-4-5",
-    system_prompt="You're a coordinator that delegates tasks to specialist agents. Use research_topic to gather information, then write_content to create engaging markdown content.",
+    output_type=Article,
+    system_prompt="You're a coordinator that delegates tasks to specialist agents. Use research_topic to gather information, then write_content to create the article. Return the final article content in the Article format.",
     instrument=True,
 )
 
@@ -80,5 +89,7 @@ result = coordinator.run_sync(
     "I need an engaging article about quantum computing. First research it, then write compelling markdown content."
 )
 
-console.print(Markdown(result.output))
+article = cast(Article, result.output)
+
+console.print(Panel(Markdown(article.content), title="Quantum Computing Article", border_style="cyan"))
 console.print()
