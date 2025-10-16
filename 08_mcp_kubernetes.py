@@ -16,7 +16,6 @@ image tags, pod status, and logs for the ai-data-collector API and UI services.
 Shows how to use MCP servers for infrastructure monitoring and operations.
 """
 
-import asyncio
 import os
 
 import logfire
@@ -29,19 +28,14 @@ model = os.getenv("MODEL")
 logfire.configure(send_to_logfire=False)
 logfire.instrument_pydantic_ai()
 
+kubernetes_mcp_server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@0.0.53"], timeout=30)
 
-async def main():
-    kubernetes_mcp_server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@0.0.53"], timeout=30)
+agent = Agent(
+    model,
+    toolsets=[kubernetes_mcp_server],
+    system_prompt="You're a Kubernetes monitoring assistant. Check deployment status and report findings.",
+)
 
-    agent = Agent(
-        model,
-        toolsets=[kubernetes_mcp_server],
-        system_prompt="You're a Kubernetes monitoring assistant. Check deployment status and report findings.",
-    )
-
-    async with agent:
-        result = await agent.run("Check the status of ai-data-collector")
-        print(result.output)
-
-
-asyncio.run(main())
+with agent:
+    result = agent.run_sync("Check the status of ai-data-collector")
+    print(result.output)
