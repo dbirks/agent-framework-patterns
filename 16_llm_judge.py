@@ -53,12 +53,12 @@ judge_agent = Agent(
     output_type=LinkedInJudgment,
     system_prompt=dedent(
         """
-        You're a LinkedIn content validator. Posts must have ALL of these:
-        - At least 3 emojis (🎉, 💡, 🚀, etc)
-        - Humble brag phrases ("thrilled to announce", "honored to share", "grateful")
-        - Superlatives ("amazing", "incredible", "fantastic", "awesome")
+        You're a LinkedIn content validator. Posts must have all of these:
+        - At least 10 emojis
+        - At least 3 humble brag phrases
+        - At least 3 superlatives
 
-        Only approve if ALL criteria are met. Be specific in feedback about what's missing.
+        Only approve if all criteria are met. Be specific in feedback about what's missing.
         """
     ).strip(),
     instrument=True,
