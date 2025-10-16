@@ -17,7 +17,6 @@ retries. Shows the output_validator pattern combined with LLM-as-judge.
 
 import os
 from textwrap import dedent
-from typing import cast
 
 import logfire
 from dotenv import load_dotenv
@@ -45,7 +44,7 @@ class LinkedInJudgment(BaseModel):
 
 
 # Judge agent using fast Haiku model
-judge_agent = Agent(
+judge_agent = Agent[None, LinkedInJudgment](
     "anthropic:claude-haiku-4-5",
     output_type=LinkedInJudgment,
     system_prompt=dedent(
@@ -66,7 +65,7 @@ judge_agent = Agent(
 # Main writer agent
 writer_agent = Agent(
     model,
-    system_prompt="You write LinkedIn posts about professional updates and achievements. Use bullet points for lists and key accomplishments.",
+    system_prompt="You write LinkedIn posts about professional updates and achievements. Use proper markdown formatting with bullet points on separate lines (- item or * item, each on its own line).",
     output_retries=10,
     instrument=True,
 )
@@ -83,7 +82,7 @@ def validate_with_judge(post: str) -> str:
 
     # Call the judge agent to evaluate
     judge_result = judge_agent.run_sync(f"Evaluate this LinkedIn post:\n\n{post}")
-    judgment = cast(LinkedInJudgment, judge_result.output)
+    judgment = judge_result.output
 
     # Log the judgment
     logfire.info(
