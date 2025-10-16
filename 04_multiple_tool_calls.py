@@ -65,26 +65,9 @@ def get_weather(city: str) -> str:
         return f"Unable to fetch weather for {city}"
 
 
-# Run the agent with a query that requires multiple tool calls
-print("🔧 Multiple Tool Calls Demo")
-print("=" * 70)
+result = agent.run_sync("What's the temperature in Tokyo, Sydney, and London right now?")
+
 print()
-
-query = "What's the temperature in Tokyo, Sydney, and London right now?"
-
-print(f"👤 User: {query}")
-print()
-print("🤖 Agent is calling multiple tools to answer your question...")
-print()
-
-result = agent.run_sync(query)
-
 print("=" * 70)
 print(f"🤖 Agent Response:\n\n{result.output}")
 print()
-print("=" * 70)
-print("✅ The agent called get_weather() multiple times:")
-print("   • Once for Tokyo")
-print("   • Once for Sydney")
-print("   • Once for London")
-print("✅ Check Logfire output above to see each tool call traced")
