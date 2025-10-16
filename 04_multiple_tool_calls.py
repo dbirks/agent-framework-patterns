@@ -43,7 +43,7 @@ agent = Agent(
 
 @agent.tool_plain
 def get_weather(city: str) -> str:
-    """Fetch current weather for a specific city from wttr.in API."""
+    """Fetch current temperature for a specific city from wttr.in API."""
     try:
         url = f"https://wttr.in/{city}?format=j1"
         logfire.info("Fetching weather", city=city)
@@ -55,11 +55,8 @@ def get_weather(city: str) -> str:
 
         current = data["current_condition"][0]
         temp_f = current["temp_F"]
-        condition = current["weatherDesc"][0]["value"]
-        humidity = current["humidity"]
-        wind = current["windspeedMiles"]
 
-        result = f"{city}: {temp_f}°F, {condition}, {humidity}% humidity, {wind} mph wind"
+        result = f"{city} is currently {temp_f}°F"
         logfire.info("Weather retrieved", city=city, temp_f=temp_f)
         return result
 
@@ -77,21 +74,20 @@ def convert_temperature(temp_f: float) -> str:
 
 
 @agent.tool_plain
-def compare_cities(city1: str, city2: str) -> str:
-    """Compare basic facts about two cities."""
-    # Simple comparison data
-    city_info = {
-        "New York": {"population": "8.3M", "timezone": "EST"},
-        "London": {"population": "9.0M", "timezone": "GMT"},
-        "Tokyo": {"population": "14M", "timezone": "JST"},
-        "Sydney": {"population": "5.3M", "timezone": "AEST"},
+def get_timezone(city: str) -> str:
+    """Get the timezone for a city."""
+    # Simple timezone data
+    city_timezones = {
+        "New York": "EST (UTC-5)",
+        "London": "GMT (UTC+0)",
+        "Tokyo": "JST (UTC+9)",
+        "Sydney": "AEST (UTC+10)",
+        "Paris": "CET (UTC+1)",
     }
 
-    info1 = city_info.get(city1, {"population": "Unknown", "timezone": "Unknown"})
-    info2 = city_info.get(city2, {"population": "Unknown", "timezone": "Unknown"})
-
-    result = f"{city1}: {info1['population']} population, {info1['timezone']} timezone. {city2}: {info2['population']} population, {info2['timezone']} timezone."
-    logfire.info("Cities compared", city1=city1, city2=city2)
+    timezone = city_timezones.get(city, "Unknown timezone")
+    result = f"{city} is in {timezone}"
+    logfire.info("Timezone retrieved", city=city, timezone=timezone)
     return result
 
 
