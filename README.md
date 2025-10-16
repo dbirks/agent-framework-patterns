@@ -18,7 +18,7 @@ brew install uv
 winget install astral-sh.uv
 ```
 
-### Configure Environment
+### Configure environment variables
 
 Copy `.env.example` to `.env` and add your API keys:
 
@@ -81,7 +81,7 @@ Connects to a Kubernetes MCP server and uses its tools to check deployment statu
 Interactive travel planning assistant that maintains context across multiple turns by passing `message_history` between runs. The agent asks questions and remembers your answers.
 
 ### [`08_llm_as_judge.py`](08_llm_as_judge.py) - LLM as Judge Pattern
-A writer agent creates LinkedIn posts, and a judge agent (Haiku) validates them against strict criteria (emojis, humble brags, superlatives, hashtags). Uses `@agent.output_validator` for automatic retry loops.
+A writer agent creates LinkedIn posts, and a judge agent (claude haiku) validates them against criteria. Uses `@agent.output_validator` for automatic retry loops.
 
 ### [`09_human_in_the_loop.py`](09_human_in_the_loop.py) - Human-in-the-Loop
 Multi-agent goat negotiation where your negotiator agent works with you to buy goats from an unpredictable seller agent. You approve or modify each counteroffer before it's sent.
