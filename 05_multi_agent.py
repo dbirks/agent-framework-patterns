@@ -18,7 +18,6 @@ Shows how different models can be used for different specialized tasks.
 """
 
 import os
-from typing import cast
 
 import logfire
 from dotenv import load_dotenv
@@ -56,7 +55,7 @@ writing_agent = Agent(
 )
 
 # Create main coordinator agent
-coordinator = Agent(
+coordinator = Agent[None, Article](
     "anthropic:claude-haiku-4-5",
     output_type=Article,
     system_prompt="You're a coordinator that delegates tasks to specialist agents. Use research_topic to gather information, then write_content to create the article. Return the final article content in the Article format.",
@@ -89,7 +88,7 @@ result = coordinator.run_sync(
     "I need an engaging article about quantum computing. First research it, then write compelling prose content."
 )
 
-article = cast(Article, result.output)
+article = result.output
 
 console.print(Panel(Markdown(article.content), title="Article", border_style="cyan"))
 console.print()

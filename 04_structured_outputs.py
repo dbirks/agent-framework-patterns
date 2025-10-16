@@ -19,7 +19,6 @@ Shows how to combine type-safe outputs with professional data presentation.
 
 import os
 from textwrap import dedent
-from typing import cast
 
 import httpx
 import logfire
@@ -56,7 +55,7 @@ class WeatherReport(BaseModel):
 
 
 # Create a weather agent with structured output
-agent = Agent(
+agent = Agent[None, WeatherReport](
     model,
     output_type=WeatherReport,
     system_prompt=dedent(
@@ -71,7 +70,7 @@ agent = Agent(
 
 
 @agent.tool_plain
-def get_weather(city: str) -> dict:
+def get_weather(city: str) -> dict[str, str | int]:
     """Fetch real weather data from wttr.in API for a specific city."""
     try:
         url = f"https://wttr.in/{city}?format=j1"
@@ -130,7 +129,7 @@ result = agent.run_sync(
     ).strip()
 )
 
-weather_report = cast(WeatherReport, result.output)
+weather_report = result.output
 
 # Create Rich table for display
 console = Console()
