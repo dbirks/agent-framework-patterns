@@ -8,8 +8,9 @@
 # ///
 
 import os
-from pydantic import BaseModel, Field, field_validator
+
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent
 
 # Load environment variables from .env file
