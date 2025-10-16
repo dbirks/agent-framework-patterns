@@ -22,7 +22,7 @@ from textwrap import dedent
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from pydantic_ai.mcp import MCPClient
+from pydantic_ai.mcp import MCPServerStdio
 
 # Load environment variables
 load_dotenv(override=True)
@@ -79,12 +79,19 @@ async def check_cluster_status():
     print("Connecting to Kubernetes MCP server...")
     print()
 
-    # Connect to the Kubernetes MCP server via pnpx
-    async with MCPClient("pnpx", ["kubernetes-mcp-server@latest"]) as client:
-        # Add MCP tools to the agent
-        agent_with_mcp = agent.with_tools(client)
+    # Create MCP server connection to kubernetes-mcp-server
+    server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@latest"], timeout=30)
 
-        # Query for deployment status
+    # Create agent with MCP server as toolset
+    agent_with_mcp = Agent(
+        model,
+        output_type=ClusterReport,
+        toolsets=[server],
+        system_prompt=agent.system_prompt,
+    )
+
+    # Query for deployment status with async context
+    async with agent_with_mcp:
         result = await agent_with_mcp.run(
             dedent(
                 """
@@ -107,8 +114,8 @@ async def check_cluster_status():
             ).strip()
         )
 
-        report: ClusterReport = result.output
-        return report
+    report: ClusterReport = result.output
+    return report
 
 
 # Run the async function
