@@ -7,6 +7,13 @@
 #   "mcp==1.3.2",
 # ]
 # ///
+"""
+MCP-Style File System Tools
+
+Demonstrates tools that follow the Model Context Protocol (MCP) pattern for file operations.
+Shows how to create file system tools that can read files, list directories, and get file info.
+MCP-style tools provide a standardized interface for agent-environment interactions.
+"""
 
 import os
 

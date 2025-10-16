@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+RAG (Retrieval-Augmented Generation) Knowledge Base
+
+Demonstrates the RAG pattern where an agent searches a knowledge base before answering.
+The agent retrieves relevant documentation and grounds its responses in factual content,
+reducing hallucination. Shows how to integrate external knowledge sources with LLMs.
+"""
 
 import os
 

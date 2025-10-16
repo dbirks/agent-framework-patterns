@@ -59,6 +59,20 @@ git add -A && git commit -m "refactor: simplify agent composition"
 
 Use conventional commit prefixes: `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`
 
+## Script Descriptions
+
+**Each script has a docstring at the top describing what it demonstrates.** When adding new scripts or significantly modifying existing ones, always update the docstring to reflect the current functionality.
+
+Example format:
+```python
+"""
+Script Title
+
+Brief description of what the script demonstrates.
+Additional context about the pattern or technique shown.
+"""
+```
+
 ## Architecture Patterns
 
 The examples progress from basic to advanced patterns:

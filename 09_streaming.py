@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Streaming Responses
+
+Demonstrates how to stream agent responses token-by-token using run_stream().
+Useful for long-form content where you want to show progressive output to users,
+improving perceived responsiveness and user experience.
+"""
 
 import os
 import sys

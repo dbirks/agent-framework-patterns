@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Dynamic System Prompts
+
+Demonstrates context-dependent system prompts using deps_type and RunContext.
+System prompts adapt based on user expertise level, communication style, and time of day.
+Shows how to personalize agent behavior based on runtime context without changing code.
+"""
 
 import os
 from dataclasses import dataclass

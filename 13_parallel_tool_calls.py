@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Parallel Tool Calls
+
+Demonstrates concurrent tool execution where the agent calls multiple independent tools
+to gather comprehensive information. The model can execute tool calls in parallel when
+they don't depend on each other, improving performance for complex queries.
+"""
 
 import os
 import random

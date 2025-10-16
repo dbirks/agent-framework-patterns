@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Conversation History
+
+Demonstrates multi-turn conversations by passing message_history between agent runs.
+The agent maintains context across multiple interactions, remembering previous exchanges
+to provide coherent, contextual responses. Essential for chatbot and assistant applications.
+"""
 
 import os
 

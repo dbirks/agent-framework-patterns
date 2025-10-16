@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Multiple Tools with Observability
+
+Demonstrates an agent with multiple tools working together to handle complex requests.
+Shows how to integrate Logfire for local-only observability without sending data to cloud.
+The weather assistant can check current weather, get forecasts, and convert temperatures.
+"""
 
 import os
 import random

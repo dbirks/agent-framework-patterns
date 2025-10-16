@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+LLM as Judge
+
+Demonstrates using an LLM to evaluate and score outputs from other agents or models.
+A judge agent provides objective assessment with structured criteria and scoring.
+Useful for quality assurance, A/B testing, and automated evaluation of agent outputs.
+"""
 
 import os
 

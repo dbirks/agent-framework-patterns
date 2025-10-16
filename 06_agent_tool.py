@@ -6,6 +6,14 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Agent Composition with Web Search
+
+Demonstrates agent composition where a coordinator delegates to specialized sub-agents.
+The research agent (Claude Haiku 4.5) searches the web using DuckDuckGo for current information,
+while the writing agent (OpenAI o4-mini) transforms that information into engaging content.
+Shows how different models can be used for different specialized tasks.
+"""
 
 import os
 

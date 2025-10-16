@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Human-in-the-Loop Example
+
+Demonstrates interactive approval workflow where the agent requests user confirmation
+before performing sensitive operations. Tools can prompt for user input to ensure
+human oversight of critical actions like file deletion or modification.
+"""
 
 import os
 

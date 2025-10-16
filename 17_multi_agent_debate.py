@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Multi-Agent Debate
+
+Demonstrates multiple agents with different perspectives debating to reach consensus.
+Optimist, pessimist, and pragmatist agents discuss a topic before a judge synthesizes
+their viewpoints into a balanced decision. Reduces bias and produces well-rounded analysis.
+"""
 
 import os
 

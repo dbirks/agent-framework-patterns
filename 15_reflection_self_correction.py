@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Reflection and Self-Correction
+
+Demonstrates agents that critique and improve their own outputs through iterative refinement.
+The agent generates an initial response, reflects on its quality, and produces an improved version.
+Useful for tasks requiring high quality output or multiple revision cycles.
+"""
 
 import os
 

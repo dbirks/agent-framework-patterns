@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Retry and Validation
+
+Demonstrates output validation using Pydantic validators with automatic retries.
+When agent output fails validation (e.g., invalid email format), the agent automatically
+retries to produce valid output. Ensures data quality and format compliance.
+"""
 
 import os
 

@@ -6,6 +6,12 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Simple Agent Example
+
+Demonstrates the most basic PydanticAI agent setup with a single prompt.
+Shows how to create an agent with instructions and run it synchronously.
+"""
 
 import os
 

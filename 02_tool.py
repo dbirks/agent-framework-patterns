@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Tool Definition Example
+
+Demonstrates how to define tools using @agent.tool_plain decorator.
+Tools are functions that agents can call to perform actions.
+This example shows a simple dice rolling tool that returns plain Python types.
+"""
 
 import os
 import random

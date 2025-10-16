@@ -6,6 +6,13 @@
 #   "python-dotenv==1.1.1",
 # ]
 # ///
+"""
+Structured Output with Pydantic Models
+
+Demonstrates how to get structured, validated output from agents using output_type.
+The agent extracts tasks from natural language text and returns them as typed Pydantic models
+with automatic validation. Useful for parsing, data extraction, and API responses.
+"""
 
 import os
 
