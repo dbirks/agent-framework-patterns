@@ -94,8 +94,15 @@ while True:
     logfire.info("Negotiator preparing proposal")
 
     negotiator_response = negotiator_agent.run_sync(
-        f"Here's the conversation so far:\n\n{conversation_history}\n\n"
-        f"Present the current situation to your client and recommend next steps."
+        dedent(
+            f"""
+            Here's the conversation so far:
+
+            {conversation_history}
+
+            Present the current situation to your client and recommend next steps.
+            """
+        ).strip()
     )
 
     console.print(Panel(Markdown(negotiator_response.output), title="Your Negotiator", border_style="blue"))
@@ -116,25 +123,34 @@ while True:
     for round_num in range(3):  # Up to 3 rounds of back-and-forth
         logfire.info(f"Negotiation round {round_num + 1}")
 
-        agent_prompt = f"""
-Previous conversation:
-{conversation_history}
+        negotiator_response = negotiator_agent.run_sync(
+            dedent(
+                f"""
+                Previous conversation:
+                {conversation_history}
 
-Your client said: "{user_input}"
+                Your client said: "{user_input}"
 
-Respond to the seller based on your client's feedback. Be natural and conversational.
-"""
-
-        negotiator_response = negotiator_agent.run_sync(agent_prompt)
+                Respond to the seller based on your client's feedback. Be natural and conversational.
+                """
+            ).strip()
+        )
         logfire.info(f"Negotiator says: {negotiator_response.output[:100]}")
 
         conversation_history += f"\n\nYou: {negotiator_response.output}"
 
         # Seller responds
         seller_response = seller_agent.run_sync(
-            f"Previous conversation:\n{conversation_history}\n\n"
-            f"The buyer said: {negotiator_response.output}\n\n"
-            f"Respond to their offer or counteroffer."
+            dedent(
+                f"""
+                Previous conversation:
+                {conversation_history}
+
+                The buyer said: {negotiator_response.output}
+
+                Respond to their offer or counteroffer.
+                """
+            ).strip()
         )
 
         logfire.info(f"Seller responds: {seller_response.output[:100]}")
