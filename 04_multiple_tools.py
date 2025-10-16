@@ -119,7 +119,7 @@ print()
 
 result = agent.run_sync(
     """Get the current weather for these locations around the world:
-    New York, London, Tokyo, Sydney, Paris, Dubai, São Paulo, Lagos (Nigeria),
+    New York, London, Tokyo, Sydney, Paris, Dubai, São Paulo, Cairo (Egypt),
     Beijing (China), Moscow (Russia), Portland (Oregon), Mexico City, and
     McMurdo Station (Antarctica).
     Fetch weather for all of them."""
