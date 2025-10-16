@@ -85,19 +85,3 @@ A writer agent creates LinkedIn posts, and a judge agent (claude haiku) validate
 
 ### [`09_human_in_the_loop.py`](09_human_in_the_loop.py) - Human-in-the-Loop
 Multi-agent goat negotiation where your negotiator agent works with you to buy goats from an unpredictable seller agent. You approve or modify each counteroffer before it's sent.
-
-## Key Concepts
-
-- **Agent Composition**: Coordinate multiple specialized agents for complex tasks
-- **Structured Outputs**: Type-safe responses using Pydantic models with `Agent[None, OutputType]` syntax
-- **Tool Use**: Extend agent capabilities with custom functions and external APIs
-- **Output Validation**: Automatic retry loops with judge agents for quality control
-- **Conversation History**: Multi-turn interactions with context preservation
-- **MCP Integration**: Connect to external tool servers using Model Context Protocol
-- **Observability**: Built-in Logfire tracing for debugging and monitoring
-
-## Resources
-
-- [PydanticAI Documentation](https://ai.pydantic.dev/)
-- [uv Documentation](https://docs.astral.sh/uv/)
-- [Model Context Protocol](https://modelcontextprotocol.io/)

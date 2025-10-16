@@ -78,28 +78,44 @@ Additional context about the pattern or technique shown.
 
 The examples progress from basic to advanced patterns:
 
-### Basic Patterns (01-09)
-- **01_simple.py**: Minimal agent setup
-- **02_tool.py**: Tool definition using `@agent.tool_plain` decorator
-- **03_human_in_loop.py**: Interactive approval workflow
-- **04_multiple_tools.py**: Multiple tools on single agent
-- **05_logfire.py**: Observability and instrumentation
-- **06_agent_tool.py**: Agent composition (coordinator → sub-agents)
-- **07_structured_output.py**: Pydantic model outputs with `output_type`
-- **08_mcp_server.py**: MCP (Model Context Protocol) integration
-- **09_streaming.py**: Streaming responses with `run_stream()`
-
-### Advanced Patterns (10-17)
-- **10_conversation_history.py**: Multi-turn conversations using `message_history`
-- **11_retry_validation.py**: Output validation with automatic retries
-- **12_dynamic_system_prompts.py**: Context-dependent system prompts via `deps_type`
-- **13_parallel_tool_calls.py**: Concurrent tool execution
-- **14_rag_knowledge_base.py**: Retrieval-Augmented Generation pattern
-- **15_reflection_self_correction.py**: Self-critique and improvement loop
-- **16_llm_judge.py**: Using LLM to evaluate outputs
-- **17_multi_agent_debate.py**: Multiple agents with different perspectives reaching consensus
+### Current Scripts (01-09)
+- **01_hello.py**: Simple agent with one sentence response
+- **02_tool_call.py**: Tool definition using `@agent.tool_plain` decorator with dice rolling
+- **03_multiple_tool_calls.py**: Multiple weather API tool calls with Logfire observability
+- **04_structured_outputs.py**: Structured outputs with Rich tables showing global weather
+- **05_multi_agent.py**: Agent composition - coordinator delegates to research and writing sub-agents
+- **06_using_mcp_tools.py**: MCP server integration for Kubernetes tools
+- **07_conversation_history.py**: Multi-turn travel planning with `message_history`
+- **08_llm_as_judge.py**: Output validation with judge agent and `@agent.output_validator`
+- **09_human_in_the_loop.py**: Multi-agent goat negotiation with human approval
 
 ## Key Architectural Concepts
+
+### Type Safety with Agent Generics
+**IMPORTANT**: Use explicit Agent generic syntax instead of `cast()` for type-safe outputs:
+
+```python
+# Correct approach
+agent = Agent[None, OutputType](
+    model,
+    output_type=OutputType,
+    system_prompt="...",
+    instrument=True,
+)
+
+result = agent.run_sync("prompt")
+output = result.output  # Properly typed as OutputType
+```
+
+**Don't use**:
+```python
+# Avoid this
+from typing import cast
+agent = Agent(model, output_type=OutputType, ...)
+output = cast(OutputType, result.output)
+```
+
+The `Agent[DepsT, OutputT]` syntax provides proper type inference automatically.
 
 ### Tool Decorators
 - `@agent.tool_plain`: Simple tools returning plain Python types (str, dict, list)
@@ -108,19 +124,48 @@ The examples progress from basic to advanced patterns:
 Use `tool_plain` for stateless operations, `tool` when you need `ctx.deps` or `ctx.retry`.
 
 ### Agent Composition
-Agents can use other agents as tools (see 06_agent_tool.py):
+Agents can use other agents as tools (see 05_multi_agent.py):
 ```python
+# Specialized sub-agents
+research_agent = Agent("anthropic:claude-haiku-4-5", ...)
+writing_agent = Agent("openai:o4-mini", ...)
+
 # Coordinator agent
-coordinator = Agent(model)
+coordinator = Agent[None, Article](
+    "anthropic:claude-haiku-4-5",
+    output_type=Article,
+)
 
 @coordinator.tool_plain
-def call_specialist(task: str) -> str:
-    result = specialist_agent.run_sync(task)
+def research_topic(topic: str) -> str:
+    result = research_agent.run_sync(f"Research: {topic}")
     return result.output
 ```
 
+### Retry Configuration
+- `retries`: Controls both tool calls AND output validation (default: 1)
+- `output_retries`: Specifically for output validation, overrides `retries` if set
+- For LLM-as-judge pattern, use high `output_retries` (e.g., 10) for iterative improvement
+
+```python
+writer_agent = Agent(
+    model,
+    output_retries=10,  # More attempts for validation loops
+    instrument=True,
+)
+
+@writer_agent.output_validator
+def validate_with_judge(post: str) -> str:
+    judge_result = judge_agent.run_sync(f"Evaluate: {post}")
+    judgment = judge_result.output
+    
+    if not judgment.approved:
+        raise ModelRetry(f"Rejected. {judgment.feedback}")
+    return post
+```
+
 ### Dependency Injection
-Use `deps_type` parameter with `RunContext` for type-safe runtime configuration (see 12_dynamic_system_prompts.py):
+Use `deps_type` parameter with `RunContext` for type-safe runtime configuration:
 ```python
 agent = Agent(model, deps_type=MyDeps)
 
@@ -131,10 +176,59 @@ def my_tool(ctx: RunContext[MyDeps]) -> str:
 ```
 
 ### Multi-Agent Patterns
-For complex decision-making, multiple agents with different system prompts can debate or collaborate:
-- Each agent maintains separate `message_history`
-- Final synthesis by a "judge" or "coordinator" agent
-- Enables diverse perspectives and reduces bias
+Multiple agents can collaborate or compete:
+- **LLM-as-Judge**: One agent validates another's outputs (see 08_llm_as_judge.py)
+- **Human-in-the-Loop**: Multiple agents with human approval at key points (see 09_human_in_the_loop.py)
+- **Coordinator Pattern**: Main agent delegates to specialized sub-agents (see 05_multi_agent.py)
+- Each agent can maintain separate `message_history`
+- Different models can be used for different specialized tasks
+
+### Rich Output Formatting
+- Use Rich panels and markdown for user-facing output
+- Avoid decorative print statements or emoji unless requested
+- Let Logfire handle observability, use Rich for presentation
+
+**Rich Markdown Rendering**: Instruct LLMs to use proper line breaks for bullets:
+```python
+system_prompt="Use proper markdown formatting with bullet points on separate lines (- item or * item, each on its own line)."
+```
+
+## Standard Setup Pattern
+
+All scripts follow this standard setup:
+```python
+import os
+from textwrap import dedent
+
+import logfire
+from dotenv import load_dotenv
+from pydantic_ai import Agent
+
+load_dotenv(override=True)
+model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
+```
+
+System prompts use `dedent()` and `.strip()` with closing `"""` on new line:
+```python
+system_prompt=dedent(
+    """
+    You're a helpful assistant.
+    Be concise and clear.
+    """
+).strip()
+```
+
+## Model Configuration
+
+### Model Prefixes
+- Anthropic: `anthropic:claude-haiku-4-5`
+- OpenAI: `openai:gpt-4o`
+- Google Gemini (Generative Language API): `google-gla:gemini-2.5-pro`
+- Google Vertex AI: `google-vertex:gemini-2.5-pro`
+
+The `.env.example` contains extensive model lists with defaults to Haiku for cost efficiency.
 
 ## Notes
 
@@ -142,3 +236,4 @@ For complex decision-making, multiple agents with different system prompts can d
 - No build step required; scripts are immediately executable
 - No package manager beyond `uv` - dependencies declared inline per-script
 - Models can be swapped via `MODEL` environment variable without code changes
+- Always base script descriptions on actual behavior, not just docstrings
