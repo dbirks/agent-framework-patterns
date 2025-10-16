@@ -89,7 +89,20 @@ async def check_cluster_status():
         model,
         output_type=ClusterReport,
         toolsets=[server],
-        system_prompt=agent.system_prompt,
+        system_prompt=dedent(
+            """
+            You're a Kubernetes cluster monitoring assistant using the kubernetes-mcp-server.
+            Check the status of ai-data-collector-api and ai-data-collector-ui deployments.
+
+            For each service:
+            1. Find the deployment and get the current image tag
+            2. Check replica status (desired vs ready)
+            3. Get the most recent pod restart time
+            4. Check recent logs for errors or warnings
+
+            Provide a comprehensive ClusterReport with findings.
+            """
+        ).strip(),
     )
 
     # Query for deployment status with async context
