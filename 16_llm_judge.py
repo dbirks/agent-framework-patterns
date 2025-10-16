@@ -8,20 +8,18 @@
 # ]
 # ///
 """
-LLM as Judge
+Output Validation with Retry
 
-Demonstrates using a smaller, faster LLM to validate outputs from another agent.
-The judge enforces specific criteria and provides feedback for iterative improvement.
+Demonstrates using output_validator to enforce criteria and automatically retry
+when outputs don't meet requirements. Simpler than using a separate judge agent.
 """
 
 import os
-from textwrap import dedent
-from typing import cast
+import re
 
 import logfire
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
-from pydantic_ai import Agent
+from pydantic_ai import Agent, ModelRetry
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
@@ -33,94 +31,49 @@ model = os.getenv("MODEL")
 logfire.configure(send_to_logfire=False)
 logfire.instrument_pydantic_ai()
 
-
-class LinkedInJudgment(BaseModel):
-    approved: bool = Field(description="Whether the post meets LinkedIn standards")
-    emoji_count: int = Field(description="Number of emojis found", ge=0)
-    has_humble_brag: bool = Field(description="Contains humble brag phrases")
-    has_superlatives: bool = Field(description="Contains superlatives like 'amazing', 'incredible'")
-    feedback: str = Field(description="Specific feedback for improvement")
-
-
-writer_agent = Agent(
+agent = Agent(
     model,
     system_prompt="You write LinkedIn posts about professional updates and achievements.",
+    retries=3,
     instrument=True,
 )
 
-judge_agent = Agent(
-    "anthropic:claude-haiku-4-5",
-    output_type=LinkedInJudgment,
-    system_prompt=dedent(
-        """
-        You're a LinkedIn content validator. Posts must have all of these:
-        - At least 10 emojis
-        - At least 3 humble brag phrases
-        - At least 3 superlatives
 
-        Only approve if all criteria are met. Be specific in feedback about what's missing.
-        """
-    ).strip(),
-    instrument=True,
-)
+@agent.output_validator
+def validate_linkedin_post(post: str) -> str:
+    """Validate that post meets LinkedIn cringey standards."""
 
-console.print("\n[bold cyan]LinkedIn Post Generator with LLM Judge[/bold cyan]\n")
-
-topic = "Write a post about getting promoted to senior engineer"
-max_attempts = 3
-feedback = ""
-
-logfire.info(f"Starting LinkedIn post generation with {max_attempts} max attempts")
-
-for attempt in range(1, max_attempts + 1):
-    logfire.info(f"Attempt {attempt}/{max_attempts}")
-    console.print(f"[bold yellow]Attempt {attempt}/{max_attempts}[/bold yellow]\n")
-
-    if attempt == 1:
-        prompt = topic
-    else:
-        prompt = f"{topic}\n\nPrevious attempt was rejected. Improve it based on this feedback:\n{feedback}"
-        logfire.info(f"Using feedback from previous attempt: {feedback}")
-
-    logfire.info("Generating post with writer agent")
-    result = writer_agent.run_sync(prompt)
-    post = result.output
-
-    console.print(Panel(Markdown(post), title=f"Draft {attempt}", border_style="blue"))
-
-    logfire.info("Evaluating post with judge agent")
-    judge_result = judge_agent.run_sync(f"Evaluate this LinkedIn post:\n\n{post}")
-    judgment = cast(LinkedInJudgment, judge_result.output)
-
-    logfire.info(
-        f"Judge verdict: approved={judgment.approved}, emojis={judgment.emoji_count}, "
-        f"humble_brag={judgment.has_humble_brag}, superlatives={judgment.has_superlatives}"
+    emoji_count = len(re.findall(r"[\U0001F300-\U0001F9FF]", post))
+    humble_brags = sum(
+        1 for phrase in ["thrilled", "honored", "grateful", "humbled", "blessed"] if phrase.lower() in post.lower()
+    )
+    superlatives = sum(
+        1 for word in ["amazing", "incredible", "fantastic", "awesome", "outstanding"] if word.lower() in post.lower()
     )
 
-    status = "✅ APPROVED" if judgment.approved else "❌ REJECTED"
-    judge_output = f"""
-**Status:** {status}
+    logfire.info(f"Validation check: emojis={emoji_count}, humble_brags={humble_brags}, superlatives={superlatives}")
 
-**Metrics:**
-- Emojis: {judgment.emoji_count}
-- Humble Brag: {"✅" if judgment.has_humble_brag else "❌"}
-- Superlatives: {"✅" if judgment.has_superlatives else "❌"}
+    issues = []
+    if emoji_count < 3:
+        issues.append(f"Need at least 3 emojis (found {emoji_count})")
+    if humble_brags < 2:
+        issues.append(f"Need at least 2 humble brag phrases (found {humble_brags})")
+    if superlatives < 2:
+        issues.append(f"Need at least 2 superlatives (found {superlatives})")
 
-**Feedback:** {judgment.feedback}
-"""
+    if issues:
+        feedback = ". ".join(issues)
+        logfire.warn(f"Post rejected: {feedback}")
+        raise ModelRetry(f"Post doesn't meet LinkedIn standards. {feedback}. Add more LinkedIn clichés.")
 
-    console.print(
-        Panel(Markdown(judge_output), title="Judge Evaluation", border_style="green" if judgment.approved else "red")
-    )
+    logfire.info("Post approved!")
+    return post
 
-    if judgment.approved:
-        logfire.info(f"Post approved after {attempt} attempt(s)")
-        console.print(f"\n[bold green]Post approved after {attempt} attempt(s)![/bold green]\n")
-        break
 
-    logfire.warn(f"Post rejected on attempt {attempt}: {judgment.feedback}")
-    feedback = judgment.feedback
-    console.print()
-else:
-    logfire.error(f"Failed to meet criteria after {max_attempts} attempts")
-    console.print(f"\n[bold red]Failed to meet criteria after {max_attempts} attempts[/bold red]\n")
+console.print("\n[bold cyan]LinkedIn Post Generator with Output Validation[/bold cyan]\n")
+
+result = agent.run_sync("Write a post about getting promoted to senior engineer")
+post = result.output
+
+console.print(Panel(Markdown(post), title="Final Post", border_style="green"))
+console.print(f"\n[dim]Took {len(result.all_messages())} messages (includes retries)[/dim]\n")
