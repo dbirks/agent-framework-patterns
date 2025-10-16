@@ -22,6 +22,7 @@ from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStdio
 from rich.console import Console
 from rich.markdown import Markdown
+from rich.panel import Panel
 
 console = Console()
 
@@ -39,9 +40,9 @@ agent = Agent(
     instrument=True,
 )
 
-console.print("\n[bold cyan]Kubernetes Monitoring with MCP[/bold cyan]\n")
+console.print("\n[bold cyan]Kubernetes investigation with MCP[/bold cyan]\n")
 
 result = agent.run_sync("Check the status of ai-data-collector")
 
-console.print(Markdown(result.output))
+console.print(Panel(Markdown(result.output), title="Deployment Status", border_style="cyan"))
 console.print()
