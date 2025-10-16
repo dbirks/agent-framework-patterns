@@ -40,6 +40,7 @@ class LinkedInJudgment(BaseModel):
     emoji_count: int = Field(description="Number of emojis found", ge=0)
     humble_brag_count: int = Field(description="Number of humble brag phrases found", ge=0)
     superlatives_count: int = Field(description="Number of superlatives found", ge=0)
+    hashtag_count: int = Field(description="Number of hashtags found", ge=0)
     feedback: str = Field(description="Specific feedback about what's missing or why it was approved")
 
 
@@ -53,6 +54,7 @@ judge_agent = Agent(
         - At least 10 emojis
         - At least 3 humble brag phrases
         - At least 3 superlatives
+        - At least 30 hashtags
 
         Count each criterion carefully. Only approve if ALL criteria are met.
         Be specific in feedback about what's missing or what was good.
@@ -86,7 +88,8 @@ def validate_with_judge(post: str) -> str:
     # Log the judgment
     logfire.info(
         f"Judge verdict: approved={judgment.approved}, emojis={judgment.emoji_count}, "
-        f"humble_brags={judgment.humble_brag_count}, superlatives={judgment.superlatives_count}"
+        f"humble_brags={judgment.humble_brag_count}, superlatives={judgment.superlatives_count}, "
+        f"hashtags={judgment.hashtag_count}"
     )
 
     # Display judgment in console
@@ -99,6 +102,7 @@ def validate_with_judge(post: str) -> str:
         - Emojis: {judgment.emoji_count}/10
         - Humble Brags: {judgment.humble_brag_count}/3
         - Superlatives: {judgment.superlatives_count}/3
+        - Hashtags: {judgment.hashtag_count}/30
 
         **Feedback:** {judgment.feedback}
         """
