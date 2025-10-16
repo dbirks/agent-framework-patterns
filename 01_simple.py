@@ -7,6 +7,8 @@
 # ]
 # ///
 
+import os
+
 from dotenv import load_dotenv
 
 from pydantic_ai import Agent
@@ -14,8 +16,11 @@ from pydantic_ai import Agent
 # Load environment variables from .env file
 load_dotenv(override=True)
 
-# Create a simple agent with Claude Sonnet 4.0
-agent = Agent("anthropic:claude-sonnet-4-0", instructions="Be concise, reply with one sentence.")
+# Get model from environment or use default
+model = os.getenv("MODEL", "anthropic:claude-sonnet-4-0")
+
+# Create a simple agent with the configured model
+agent = Agent(model, instructions="Be concise, reply with one sentence.")
 
 # Run the agent synchronously with a simple prompt
 result = agent.run_sync('Where does "hello world" come from?')
