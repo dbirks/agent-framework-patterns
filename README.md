@@ -1,6 +1,6 @@
 # Agent framework patterns
 
-A collection of example scripts demonstrating common patterns and capabilities in PydanticAI. These scripts progress from basic agent setup to advanced multi-agent orchestration, showing practical patterns for building AI agents with structured outputs, tool use, and observability.
+A collection of example scripts showing some common patterns in AI agent frameworks, here specifically using PydanticAI. The concepts are mostly all transferable to other frameworks though, hopefully making this a quick intro to agent frameworks in general.
 
 ## Prerequisites
 
