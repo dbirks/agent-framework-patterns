@@ -2,8 +2,9 @@
 # /// script
 # requires-python = ">=3.14,<3.15"
 # dependencies = [
-#   "pydantic-ai[duckduckgo]==1.1.0",
+#   "pydantic-ai==1.1.0",
 #   "python-dotenv==1.1.1",
+#   "ddgs==9.6.1",
 # ]
 # ///
 """
@@ -19,7 +20,7 @@ import os
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent
-from pydantic_ai.common_tools import duckduckgo_search_tool
+from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -28,7 +29,7 @@ load_dotenv(override=True)
 research_agent = Agent(
     "anthropic:claude-haiku-4-5",
     system_prompt="You're a research specialist. Search the web for factual, up-to-date information about topics. Use the search tool to gather current information.",
-    tools=[duckduckgo_search_tool],
+    tools=[duckduckgo_search_tool()],
 )
 
 writing_agent = Agent(
