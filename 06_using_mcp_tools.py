@@ -36,8 +36,7 @@ kubernetes_mcp_server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@0.0.
 agent = Agent(
     model,
     toolsets=[kubernetes_mcp_server],
-    system_prompt="You're a Kubernetes monitoring assistant. Check deployment status and report findings in clear, formatted text.",
-    instrument=True,
+    system_prompt="You're a Kubernetes monitoring assistant. Check deployment status and report findings in clear, formatted text. Be persistent and thorough.",
 )
 
 console.print("\n[bold cyan]Kubernetes investigation with MCP[/bold cyan]\n")
