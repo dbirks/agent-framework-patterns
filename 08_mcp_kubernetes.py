@@ -80,7 +80,7 @@ async def check_cluster_status():
     print()
 
     # Create MCP server connection to kubernetes-mcp-server
-    server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@latest"], timeout=30)
+    server = MCPServerStdio("pnpx", args=["kubernetes-mcp-server@0.0.53"], timeout=30)
 
     # Create agent with MCP server as toolset
     agent_with_mcp = Agent(
