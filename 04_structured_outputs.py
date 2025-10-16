@@ -19,6 +19,7 @@ Shows how to combine type-safe outputs with professional data presentation.
 
 import os
 from textwrap import dedent
+from typing import cast
 
 import httpx
 import logfire
@@ -129,7 +130,7 @@ result = agent.run_sync(
     ).strip()
 )
 
-weather_report: WeatherReport = result.output
+weather_report = cast(WeatherReport, result.output)
 
 # Create Rich table for display
 console = Console()

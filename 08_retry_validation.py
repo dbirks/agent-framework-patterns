@@ -15,6 +15,7 @@ When agent output fails validation, the agent automatically retries to produce v
 
 import os
 import re
+from typing import cast
 
 import logfire
 from dotenv import load_dotenv
@@ -57,7 +58,7 @@ agent = Agent(
 text = "Contact John Smith at john.smith@example.com or call 555-123-4567. He's 35 years old."
 
 result = agent.run_sync(f"Extract contact information: {text}")
-contact = result.output
+contact = cast(ContactInfo, result.output)
 
 print(f"Name: {contact.name}")
 print(f"Email: {contact.email}")
