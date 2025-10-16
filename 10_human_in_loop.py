@@ -137,7 +137,9 @@ while True:
             ).strip()
         )
         console.print(
-            Panel(Markdown(negotiator_response.output), title=f"You (Round {round_num + 1})", border_style="blue")
+            Panel(
+                Markdown(negotiator_response.output), title=f"Negotiator (Round {round_num + 1})", border_style="blue"
+            )
         )
 
         conversation_history += f"\n\nYou: {negotiator_response.output}"
