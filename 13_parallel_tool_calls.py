@@ -18,13 +18,14 @@ import os
 import random
 import time
 
+import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 # Create an agent that aggregates city information
 agent = Agent(

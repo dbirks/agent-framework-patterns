@@ -16,14 +16,15 @@ retries to produce valid output. Ensures data quality and format compliance.
 
 import os
 
+import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 
 # Define structured output with strict validation

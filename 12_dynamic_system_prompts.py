@@ -18,13 +18,14 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 
+import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent, RunContext
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 
 # Define dependencies that will control the dynamic system prompt

@@ -19,14 +19,16 @@ Shows how to use MCP servers for infrastructure monitoring and operations.
 import os
 from textwrap import dedent
 
+import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStdio
 
-# Load environment variables
 load_dotenv(override=True)
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 
 # Structured output for deployment status

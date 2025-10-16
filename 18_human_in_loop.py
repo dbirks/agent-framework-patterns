@@ -16,13 +16,14 @@ human oversight of critical actions like file deletion or modification.
 
 import os
 
+import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 # Create an agent
 agent = Agent(model, system_prompt="You're a helpful file organizer assistant.")

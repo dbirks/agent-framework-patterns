@@ -16,13 +16,14 @@ to provide coherent, contextual responses. Essential for chatbot and assistant a
 
 import os
 
+import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 # Create a travel planning assistant
 agent = Agent(

@@ -17,13 +17,14 @@ reducing hallucination. Shows how to integrate external knowledge sources with L
 import os
 from textwrap import dedent
 
+import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 # Knowledge base - simulating a documentation database
 KNOWLEDGE_BASE = [

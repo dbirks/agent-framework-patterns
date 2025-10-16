@@ -28,11 +28,8 @@ from pydantic_ai import Agent
 from rich.console import Console
 from rich.table import Table
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
-
 logfire.configure(send_to_logfire=False)
 logfire.instrument_pydantic_ai()
 

@@ -17,14 +17,15 @@ their viewpoints into a balanced decision. Reduces bias and produces well-rounde
 import os
 from textwrap import dedent
 
+import logfire
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 
-# Load environment variables from .env file
 load_dotenv(override=True)
-
 model = os.getenv("MODEL")
+logfire.configure(send_to_logfire=False)
+logfire.instrument_pydantic_ai()
 
 
 # Structured output for final decision
