@@ -9,11 +9,12 @@
 # ]
 # ///
 """
-Multiple Tools with Real Weather API
+Structured Outputs with Rich Tables
 
-Demonstrates an agent with multiple tools working together to fetch real weather data.
-Uses wttr.in API via httpx for actual weather lookups across multiple cities worldwide.
-Displays results in a beautiful Rich table with structured Pydantic outputs and Logfire observability.
+Demonstrates structured output using Pydantic models combined with Rich table visualization.
+The agent fetches real weather data for multiple cities worldwide using wttr.in API,
+returns typed WeatherReport objects, and displays results in a beautiful formatted table.
+Shows how to combine type-safe outputs with professional data presentation.
 """
 
 import os
