@@ -76,6 +76,9 @@ def validate_with_judge(post: str) -> str:
 
     logfire.info("Calling judge agent to evaluate post")
 
+    # Show the post being judged
+    console.print(Panel(Markdown(post), title="Draft Post", border_style="blue"))
+
     # Call the judge agent to evaluate
     judge_result = judge_agent.run_sync(f"Evaluate this LinkedIn post:\n\n{post}")
     judgment = cast(LinkedInJudgment, judge_result.output)
@@ -110,7 +113,6 @@ def validate_with_judge(post: str) -> str:
     )
 
     if not judgment.approved:
-        logfire.warn(f"Post rejected by judge: {judgment.feedback}")
         raise ModelRetry(f"Post rejected. {judgment.feedback}")
 
     logfire.info("Post approved by judge")
