@@ -11,8 +11,8 @@
 Conversation History
 
 Demonstrates multi-turn conversations by passing message_history between agent runs.
-ShowsShows howhow agents maintainagents maintain context across multiple interactionsTheagentasks
-questions to gather travel preferencesremembersdetails throughout.
+Shows how agents maintain context across multiple interactions. The agent asks
+questions to gather travel preferences and remembers details throughout.
 """
 
 import os
@@ -32,28 +32,22 @@ agent = Agent(
     model,
     system_prompt=dedent(
         """
-        You're a assistant. Ask the user questions to learn about
+        You're a travel planning assistant. Ask the user questions to learn about
         their travel preferences, then provide personalized recommendations.
         Remember all details from the conversation.
         """
     ).strip(),
 )
 
-print("Chat with the\n")
+print("Travel Planning Assistant\n")
 
-message_historyStarttheconversation-letthe agent initiateresult = NoneStarthelping me plan.result
+# Start the conversation - let the agent initiate
+result = agent.run_sync("Start helping me plan a trip.")
+print(f"Assistant: {result.output}\n")
 
-while True:
-    user_input = Prompt.ask("[bold blue]You[/bold blue]")
+message_history = result.new_messages()
 
-    if user_input.lower() in ["exit", "quit"]:
-        break
-
-    result = agent.run_sync(user_input, message_history=message_history)
-    print(f"[bold green]Assistant[/bold green]: {result.output}\n")
-
-    message_history = result.new_messages()
-  result# Interactive conversation loop
+# Interactive conversation loop
 while True:
     user_input = Prompt.ask("You")
 
