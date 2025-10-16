@@ -8,12 +8,10 @@
 # ]
 # ///
 """
-MCP Kubernetes Server Integration
+MCP Server Integration
 
-Demonstrates integration with the Kubernetes MCP server to query cluster resources.
-Uses pnpx to run the kubernetes-mcp-server and queries deployment information,
-image tags, pod status, and logs for the ai-data-collector API and UI services.
-Shows how to use MCP servers for infrastructure monitoring and operations.
+Demonstrates connecting to an MCP server (Kubernetes) and letting the agent
+use the server's tools to query cluster resources and report findings.
 """
 
 import os
@@ -36,6 +34,5 @@ agent = Agent(
     system_prompt="You're a Kubernetes monitoring assistant. Check deployment status and report findings.",
 )
 
-with agent:
-    result = agent.run_sync("Check the status of ai-data-collector")
-    print(result.output)
+result = agent.run_sync("Check the status of ai-data-collector")
+print(result.output)
