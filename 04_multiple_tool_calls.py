@@ -27,7 +27,7 @@ load_dotenv(override=True)
 
 model = os.getenv("MODEL")
 
-# Configure Logfire for local development (no cloud sending)
+# Configure Logfire for local development (no sending to the cloud)
 logfire.configure(send_to_logfire=False)
 
 # Instrument PydanticAI to track all agent operations
@@ -65,33 +65,7 @@ def get_weather(city: str) -> str:
         return f"Unable to fetch weather for {city}"
 
 
-@agent.tool_plain
-def convert_temperature(temp_f: float) -> str:
-    """Convert Fahrenheit temperature to Celsius."""
-    temp_c = round((temp_f - 32) * 5 / 9, 1)
-    logfire.info("Temperature converted", temp_f=temp_f, temp_c=temp_c)
-    return f"{temp_f}°F is {temp_c}°C"
-
-
-@agent.tool_plain
-def get_timezone(city: str) -> str:
-    """Get the timezone for a city."""
-    # Simple timezone data
-    city_timezones = {
-        "New York": "EST (UTC-5)",
-        "London": "GMT (UTC+0)",
-        "Tokyo": "JST (UTC+9)",
-        "Sydney": "AEST (UTC+10)",
-        "Paris": "CET (UTC+1)",
-    }
-
-    timezone = city_timezones.get(city, "Unknown timezone")
-    result = f"{city} is in {timezone}"
-    logfire.info("Timezone retrieved", city=city, timezone=timezone)
-    return result
-
-
-# Run the agent with a complex query that requires multiple tool calls
+# Run the agent with a query that requires multiple tool calls
 print("🔧 Multiple Tool Calls Demo")
 print("=" * 70)
 print()
@@ -110,8 +84,8 @@ print("=" * 70)
 print(f"🤖 Agent Response:\n\n{result.output}")
 print()
 print("=" * 70)
-print("✅ The agent called multiple tools to gather this information:")
-print("   • get_weather() - fetched temperature for cities")
-print("   • convert_temperature() - converted Fahrenheit to Celsius")
-print("   • get_timezone() - looked up timezone information")
+print("✅ The agent called get_weather() multiple times:")
+print("   • Once for Tokyo")
+print("   • Once for Sydney")
+print("   • Once for London")
 print("✅ Check Logfire output above to see each tool call traced")
