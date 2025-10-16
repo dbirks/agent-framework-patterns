@@ -82,7 +82,7 @@ def write_content(information: str, style: str = "engaging") -> str:
     return result.output
 
 
-console.print("\n[bold cyan]Agent Composition Demo[/bold cyan]\n")
+console.print("\n[bold cyan]Multi-agent demo[/bold cyan]\n")
 
 logfire.info("Starting multi-agent workflow")
 result = coordinator.run_sync(
@@ -91,5 +91,5 @@ result = coordinator.run_sync(
 
 article = cast(Article, result.output)
 
-console.print(Panel(Markdown(article.content), title="Quantum Computing Article", border_style="cyan"))
+console.print(Panel(Markdown(article.content), title="Article", border_style="cyan"))
 console.print()
