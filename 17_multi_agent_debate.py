@@ -131,11 +131,15 @@ def run_debate(topic: str, rounds: int = 2) -> Decision:
 
         # Pragmatist's turn (can see both arguments)
         print("🤔 PRAGMATIST:")
-        pragmatist_prompt = f"""Provide a practical analysis of: {topic}
+        pragmatist_prompt = dedent(
+            f"""
+            Provide a practical analysis of: {topic}
 
-Optimistic perspective: {optimist_view}
+            Optimistic perspective: {optimist_view}
 
-Risk perspective: {pessimist_view}"""
+            Risk perspective: {pessimist_view}
+            """
+        ).strip()
         if pragmatist_history:
             pragmatist_prompt += "\n\nRefine your practical assessment."
 
@@ -151,18 +155,22 @@ Risk perspective: {pessimist_view}"""
     print("⚖️  JUDGE'S DECISION")
     print("=" * 70 + "\n")
 
-    judge_prompt = f"""Based on this debate about "{topic}", provide your final decision.
+    judge_prompt = dedent(
+        f"""
+        Based on this debate about "{topic}", provide your final decision.
 
-OPTIMIST'S PERSPECTIVE:
-{optimist_view}
+        OPTIMIST'S PERSPECTIVE:
+        {optimist_view}
 
-PESSIMIST'S PERSPECTIVE:
-{pessimist_view}
+        PESSIMIST'S PERSPECTIVE:
+        {pessimist_view}
 
-PRAGMATIST'S PERSPECTIVE:
-{pragmatist_view}
+        PRAGMATIST'S PERSPECTIVE:
+        {pragmatist_view}
 
-Synthesize these viewpoints into a balanced, actionable decision."""
+        Synthesize these viewpoints into a balanced, actionable decision.
+        """
+    ).strip()
 
     judge_result = judge_agent.run_sync(judge_prompt)
     decision: Decision = judge_result.output

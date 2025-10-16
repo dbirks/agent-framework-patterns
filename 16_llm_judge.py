@@ -47,15 +47,19 @@ content_agent = Agent(
 judge_agent = Agent(
     model,
     output_type=Judgment,
-    system_prompt="""You're a quality assurance judge for product descriptions.
-Evaluate content based on these criteria:
-1. Length: 50-150 words
-2. Tone: Professional yet friendly
-3. Value proposition: Clearly states benefits
-4. Call to action: Includes compelling CTA
-5. Brand compliance: No superlatives like "best", "perfect", "revolutionary"
+    system_prompt=dedent(
+        """
+        You're a quality assurance judge for product descriptions.
+        Evaluate content based on these criteria:
+        1. Length: 50-150 words
+        2. Tone: Professional yet friendly
+        3. Value proposition: Clearly states benefits
+        4. Call to action: Includes compelling CTA
+        5. Brand compliance: No superlatives like "best", "perfect", "revolutionary"
 
-Only approve if ALL criteria are met.""",
+        Only approve if ALL criteria are met.
+        """
+    ).strip(),
 )
 
 
@@ -108,10 +112,12 @@ def generate_with_validation(product: str, max_attempts: int = 3) -> tuple[str, 
             print(f"      • {reason}")
         print(f"\n   Suggestions: {judgment.suggestions}\n")
 
-        feedback_context = f"""
-Rejection reasons: {", ".join(judgment.rejection_reasons)}
-Suggestions: {judgment.suggestions}
-"""
+        feedback_context = dedent(
+            f"""
+            Rejection reasons: {", ".join(judgment.rejection_reasons)}
+            Suggestions: {judgment.suggestions}
+            """
+        ).strip()
 
     print(f"\n⚠️  Failed to meet criteria after {max_attempts} attempts")
     return current_content, judgments

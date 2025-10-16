@@ -39,20 +39,28 @@ class Critique(BaseModel):
 # Create specialized agents
 writer_agent = Agent(
     model,
-    system_prompt="""You're a technical writer who creates clear, engaging explanations of programming concepts.
-Your explanations should be accurate, well-structured, and include examples.""",
+    system_prompt=dedent(
+        """
+        You're a technical writer who creates clear, engaging explanations of programming concepts.
+        Your explanations should be accurate, well-structured, and include examples.
+        """
+    ).strip(),
 )
 
 critic_agent = Agent(
     model,
     output_type=Critique,
-    system_prompt="""You're an expert editor who evaluates technical writing.
-Evaluate explanations on:
-- Clarity and accessibility
-- Technical accuracy
-- Use of examples
-- Overall engagement
-Provide constructive feedback for improvement.""",
+    system_prompt=dedent(
+        """
+        You're an expert editor who evaluates technical writing.
+        Evaluate explanations on:
+        - Clarity and accessibility
+        - Technical accuracy
+        - Use of examples
+        - Overall engagement
+        Provide constructive feedback for improvement.
+        """
+    ).strip(),
 )
 
 print("🔄 Reflection & Self-Correction Demo")
@@ -95,17 +103,21 @@ for iteration in range(2, max_iterations + 1):
     print(f"ITERATION {iteration}: Improved Draft")
     print(f"{'=' * 70}")
 
-    improvement_prompt = f"""Improve this explanation of {topic} based on the following feedback:
+    improvement_prompt = dedent(
+        f"""
+        Improve this explanation of {topic} based on the following feedback:
 
-Original explanation:
-{current_explanation}
+        Original explanation:
+        {current_explanation}
 
-Feedback:
-- Strengths: {", ".join(critique.strengths)}
-- Weaknesses: {", ".join(critique.weaknesses)}
-- Suggestions: {critique.suggestions}
+        Feedback:
+        - Strengths: {", ".join(critique.strengths)}
+        - Weaknesses: {", ".join(critique.weaknesses)}
+        - Suggestions: {critique.suggestions}
 
-Create an improved version that addresses the weaknesses while maintaining the strengths."""
+        Create an improved version that addresses the weaknesses while maintaining the strengths.
+        """
+    ).strip()
 
     result = writer_agent.run_sync(improvement_prompt)
     current_explanation = result.output
