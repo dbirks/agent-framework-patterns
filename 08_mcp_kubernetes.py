@@ -59,7 +59,7 @@ async def check_cluster_status():
     agent = Agent(
         model,
         toolsets=[server],
-        system_prompt="You're a Kubernetes cluster monitoring assistant. Check deployment status and report findings.",
+        system_prompt="You're a Kubernetes cluster monitoring assistant. Do thorough digging on the user's questions and check logs.",
     )
 
     # Query for deployment status
