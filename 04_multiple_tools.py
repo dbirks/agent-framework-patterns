@@ -4,7 +4,6 @@
 # dependencies = [
 #   "pydantic-ai==1.1.0",
 #   "python-dotenv==1.1.1",
-#   "logfire==4.13.2",
 # ]
 # ///
 
@@ -18,7 +17,7 @@ from pydantic_ai import Agent
 load_dotenv(override=True)
 model = os.getenv("MODEL")
 
-# Configure Logfire for local development (no cloud sending)
+# Configure Logfire for local development (no sending to PaaS Logfire)
 logfire.configure(send_to_logfire=False)
 
 # Instrument PydanticAI to track all agent operations

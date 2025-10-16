@@ -2,7 +2,7 @@
 # /// script
 # requires-python = ">=3.14,<3.15"
 # dependencies = [
-#   "pydantic-ai==1.1.0",
+#   "pydantic-ai[duckduckgo]==1.1.0",
 #   "python-dotenv==1.1.1",
 # ]
 # ///
@@ -11,27 +11,27 @@ import os
 
 from dotenv import load_dotenv
 from pydantic_ai import Agent
+from pydantic_ai.common_tools import duckduckgo_search_tool
 
 # Load environment variables from .env file
 load_dotenv(override=True)
 
-model = os.getenv("MODEL")
-
-# Create specialized sub-agents
+# Create specialized sub-agents with specific models
 research_agent = Agent(
-    model,
-    system_prompt="You're a research specialist. Provide factual, concise information about topics.",
+    "anthropic:claude-haiku-4-5",
+    system_prompt="You're a research specialist. Search the web for factual, up-to-date information about topics. Use the search tool to gather current information.",
+    tools=[duckduckgo_search_tool],
 )
 
 writing_agent = Agent(
-    model,
-    system_prompt="You're a creative writer. Transform information into engaging, well-written content.",
+    "openai:o4-mini",
+    system_prompt="You're a creative writer. Transform information into engaging, well-written content with clear structure and compelling narrative.",
 )
 
 # Create main coordinator agent
 coordinator = Agent(
-    model,
-    system_prompt="You're a coordinator that delegates tasks to specialist agents.",
+    "anthropic:claude-haiku-4-5",
+    system_prompt="You're a coordinator that delegates tasks to specialist agents. Use research_topic to gather information, then write_content to create engaging content.",
 )
 
 
