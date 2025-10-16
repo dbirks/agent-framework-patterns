@@ -9,5 +9,14 @@
         "..."
       ]
     }
+  },
+  "lsp": {
+    "ty": {
+      "settings": {
+        "inlayHints": {
+          "variableTypes": true
+        }
+      }
+    }
   }
 }
