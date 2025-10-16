@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run
 # /// script
 # requires-python = ">=3.14,<3.15"
 # dependencies = [
-#     "pydantic-ai==1.1.0",
-#     "python-dotenv==1.0.1",
+#   "pydantic-ai==1.1.0",
+#   "python-dotenv==1.0.1",
 # ]
 # ///
 
@@ -17,7 +17,7 @@ from pydantic_ai import Agent
 load_dotenv(override=True)
 
 # Get model from environment or use default
-model = os.getenv("MODEL", "anthropic:claude-sonnet-4-0")
+model = os.getenv("MODEL")
 
 # Create a simple agent with the configured model
 agent = Agent(model, instructions="Be concise, reply with one sentence.")
