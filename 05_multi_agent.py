@@ -38,20 +38,20 @@ logfire.instrument_pydantic_ai()
 
 
 class Article(BaseModel):
-    content: str = Field(description="The full article content in markdown format")
+    content: str = Field(description="The full article content as flowing prose paragraphs")
 
 
 # Create specialized sub-agents with specific models
 research_agent = Agent(
     "anthropic:claude-haiku-4-5",
-    system_prompt="You're a research specialist. Search the web for factual, up-to-date information about topics. Use the search tool to gather current information.",
+    system_prompt="You're a research specialist. Search the web for factual, up-to-date information about topics. Use the search tool to gather current information from at least 5 different articles or sources.",
     tools=[duckduckgo_search_tool()],
     instrument=True,
 )
 
 writing_agent = Agent(
     "openai:o4-mini",
-    system_prompt="You're a creative writer. Transform information into engaging, well-written markdown content with clear structure and compelling narrative.",
+    system_prompt="You're a creative writer. Transform information into engaging prose. Write in a natural, flowing narrative style with clear paragraphs. Focus on storytelling and making complex topics accessible.",
     instrument=True,
 )
 
@@ -78,7 +78,7 @@ def research_topic(topic: str) -> str:
 def write_content(information: str, style: str = "engaging") -> str:
     """Write content using the specialized writing agent."""
     logfire.info(f"Writing agent creating {style} content")
-    result = writing_agent.run_sync(f"Write {style} markdown content based on this information: {information}")
+    result = writing_agent.run_sync(f"Write {style} prose based on this information: {information}")
     return result.output
 
 
@@ -86,7 +86,7 @@ console.print("\n[bold cyan]Agent Composition Demo[/bold cyan]\n")
 
 logfire.info("Starting multi-agent workflow")
 result = coordinator.run_sync(
-    "I need an engaging article about quantum computing. First research it, then write compelling markdown content."
+    "I need an engaging article about quantum computing. First research it, then write compelling prose content."
 )
 
 article = cast(Article, result.output)
