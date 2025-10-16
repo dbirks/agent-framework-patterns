@@ -64,7 +64,7 @@ judge_agent = Agent(
 # Main writer agent
 writer_agent = Agent(
     model,
-    system_prompt="You write LinkedIn posts about professional updates and achievements.",
+    system_prompt="You write LinkedIn posts about professional updates and achievements. Use bullet points for lists and key accomplishments.",
     output_retries=10,
     instrument=True,
 )
@@ -121,7 +121,7 @@ def validate_with_judge(post: str) -> str:
 
 console.print("\n[bold cyan]LinkedIn Post with LLM Judge Validation[/bold cyan]\n")
 
-result = writer_agent.run_sync("Write a post about getting promoted to senior engineer")
+result = writer_agent.run_sync("Write a post about getting promoted to a mid-level engineer")
 post = result.output
 
 console.print(Panel(Markdown(post), title="Final Approved Post", border_style="green"))
