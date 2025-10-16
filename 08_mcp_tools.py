@@ -4,7 +4,7 @@
 # dependencies = [
 #   "pydantic-ai==1.1.0",
 #   "python-dotenv==1.1.1",
-#   "mcp==1.3.2",
+#   "mcp==1.17.0",
 # ]
 # ///
 """
