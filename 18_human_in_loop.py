@@ -10,23 +10,21 @@
 """
 Human-in-the-Loop Negotiation
 
-Demonstrates interactive approval workflow where a human negotiates a business deal
-with AI assistance. Your agent makes offers, you approve or modify them, and another
-agent plays the seller. Shows multi-agent coordination with human decision points.
+Demonstrates multi-agent negotiation with human approval. Your AI negotiator works
+with you to buy goats from an unpredictable seller. Type 'buy' to seal the deal,
+or provide feedback for your agent to continue negotiating.
 """
 
 import os
 from textwrap import dedent
-from typing import cast
 
 import logfire
 from dotenv import load_dotenv
-from pydantic import BaseModel
 from pydantic_ai import Agent
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Prompt
 
 console = Console()
 
@@ -35,159 +33,118 @@ model = os.getenv("MODEL")
 logfire.configure(send_to_logfire=False)
 logfire.instrument_pydantic_ai()
 
-
-class Offer(BaseModel):
-    price: int
-    quantity: int
-    terms: str
-    reasoning: str
-
-
-# Seller agent - plays the other business partner
+# Unpredictable seller agent
 seller_agent = Agent(
     "anthropic:claude-haiku-4-5",
-    output_type=Offer,
     system_prompt=dedent(
         """
-        You're a goat farmer trying to sell your herd. You have 50 healthy goats.
+        You're a goat farmer selling your herd. You have 50 goats.
 
-        Your bottom line: You need at least $150 per goat to make it worthwhile.
-        Your starting position: Ask for $200 per goat.
+        Your pricing: Start at $200/goat but you'll go as low as $150/goat.
 
-        Be a shrewd negotiator but willing to compromise. Consider:
-        - Buying more goats should get a better per-goat price
-        - You prefer selling the whole herd at once
-        - Payment terms matter (cash upfront is worth a discount)
+        Be unpredictable and colorful:
+        - Sometimes get offended and raise prices
+        - Sometimes ramble about your goats' names or personalities
+        - Sometimes offer weird terms (trade for chickens, singing lessons, etc)
+        - Sometimes be shrewd, sometimes be generous
+        - Keep it entertaining but eventually work toward a deal
 
-        Make counteroffers that move toward a deal but protect your interests.
+        Format your response as a natural conversation. Be expressive!
         """
     ).strip(),
     instrument=True,
 )
 
-# Negotiator agent - your AI advisor
+# Your negotiator agent
 negotiator_agent = Agent(
     model,
-    output_type=Offer,
     system_prompt=dedent(
         """
-        You're a business negotiator helping your client buy goats for their farm.
+        You're helping your client buy goats. Budget: $8000 total.
 
-        Your client's budget: $8000 total
-        Your goal: Get as many goats as possible at the best price
+        Your job:
+        1. Negotiate with the seller based on their offers
+        2. When showing offers to your client, format them clearly with:
+           - Current offer details (price, quantity, terms)
+           - Your analysis and recommendation
+           - What you plan to say next if they approve
 
-        Analyze the seller's offers and make smart counteroffers that:
-        - Work toward a deal
-        - Respect your client's budget
-        - Look for win-win terms (bulk discount, payment terms, etc)
+        Be strategic but respect your client's feedback. If they want changes,
+        incorporate their wishes into your negotiation strategy.
 
-        Be professional but firm in negotiations.
+        Format your output as markdown with clear sections.
         """
     ).strip(),
     instrument=True,
 )
 
+console.print("\n[bold cyan]🐐 Goat Negotiation Simulator[/bold cyan]\n")
+console.print("[dim]Type 'buy' to accept a deal, or give feedback to continue negotiating[/dim]\n")
 
-def display_offer(title: str, offer: Offer, color: str):
-    """Display an offer in a nice panel."""
-    content = f"""
-**Price per goat:** ${offer.price}
-**Quantity:** {offer.quantity} goats
-**Total:** ${offer.price * offer.quantity}
+logfire.info("Starting negotiation")
 
-**Terms:** {offer.terms}
+# Get seller's opening offer
+seller_response = seller_agent.run_sync("Make your opening pitch to sell your goats.")
+logfire.info(f"Seller opened: {seller_response.output[:100]}")
 
-*{offer.reasoning}*
-"""
-    console.print(Panel(Markdown(content), title=title, border_style=color))
+conversation_history = f"Seller said: {seller_response.output}"
 
+while True:
+    # Our agent analyzes and presents to us
+    logfire.info("Negotiator preparing proposal")
 
-console.print("\n[bold cyan]Goat Negotiation Simulator[/bold cyan]")
-console.print("[dim]You're buying goats for your farm. Your AI negotiator will help you make deals.[/dim]\n")
+    negotiator_response = negotiator_agent.run_sync(
+        f"Here's the conversation so far:\n\n{conversation_history}\n\n"
+        f"Present the current situation to your client and recommend next steps."
+    )
 
-logfire.info("Starting negotiation session")
+    console.print(Panel(Markdown(negotiator_response.output), title="Your Negotiator", border_style="blue"))
 
-# Round 1: Seller makes opening offer
-console.print("[bold yellow]Round 1: Opening Offer[/bold yellow]\n")
-logfire.info("Seller making opening offer")
+    # Get human input
+    user_input = Prompt.ask("\n[bold green]Your decision[/bold green]").strip()
 
-seller_result = seller_agent.run_sync("Make your opening offer for selling goats.")
-seller_offer = cast(Offer, seller_result.output)
-
-display_offer("Seller's Opening Offer", seller_offer, "red")
-logfire.info(f"Seller offers: {seller_offer.quantity} goats at ${seller_offer.price} each")
-
-# Negotiation loop
-round_num = 2
-max_rounds = 5
-
-for round_num in range(2, max_rounds + 1):
-    console.print(f"\n[bold yellow]Round {round_num}: Your Turn[/bold yellow]\n")
-
-    # Our negotiator analyzes and prepares counteroffer
-    logfire.info("Negotiator preparing counteroffer")
-
-    history = f"""
-Seller's last offer:
-- {seller_offer.quantity} goats at ${seller_offer.price} each (${seller_offer.price * seller_offer.quantity} total)
-- Terms: {seller_offer.terms}
-- Their reasoning: {seller_offer.reasoning}
-"""
-
-    negotiator_result = negotiator_agent.run_sync(f"The seller made this offer:\n{history}\n\nMake your counteroffer.")
-    our_offer = cast(Offer, negotiator_result.output)
-
-    logfire.info(f"Negotiator suggests: {our_offer.quantity} goats at ${our_offer.price} each")
-
-    display_offer("Your AI Negotiator Suggests", our_offer, "blue")
-
-    # Human approval step
-    console.print()
-    approved = Confirm.ask("[bold green]Accept this counteroffer?[/bold green]")
-
-    if not approved:
-        logfire.info("Human rejected AI suggestion, requesting modifications")
-        console.print()
-        new_price = Prompt.ask("What price per goat?", default=str(our_offer.price))
-        new_quantity = Prompt.ask("How many goats?", default=str(our_offer.quantity))
-        new_terms = Prompt.ask("Any special terms?", default=our_offer.terms)
-
-        our_offer.price = int(new_price)
-        our_offer.quantity = int(new_quantity)
-        our_offer.terms = new_terms
-        our_offer.reasoning = "Modified by human negotiator based on their preferences"
-
-        logfire.info(f"Human modified offer: {our_offer.quantity} goats at ${our_offer.price} each")
-        console.print()
-        display_offer("Your Modified Counteroffer", our_offer, "green")
-    else:
-        logfire.info("Human approved AI suggestion")
-
-    # Check if we have a deal based on reasonable terms
-    total_cost = our_offer.price * our_offer.quantity
-    seller_total = seller_offer.price * seller_offer.quantity
-
-    if abs(total_cost - seller_total) < 500 and abs(our_offer.quantity - seller_offer.quantity) <= 5:
-        console.print(f"\n[bold green]🤝 Deal reached![/bold green]")
-        console.print(f"[green]Final terms: {our_offer.quantity} goats at ${our_offer.price} each[/green]")
-        console.print(f"[green]Total: ${total_cost}[/green]\n")
-        logfire.info(f"Deal reached: {our_offer.quantity} goats at ${our_offer.price} each")
+    if user_input.lower() == "buy":
+        console.print("\n[bold green]🤝 Deal sealed![/bold green]\n")
+        logfire.info("Deal accepted by human")
         break
 
-    # Seller responds to our counteroffer
-    console.print(f"\n[bold yellow]Round {round_num + 1}: Seller's Response[/bold yellow]\n")
-    logfire.info("Sending counteroffer to seller")
+    # User gave feedback - negotiate more rounds
+    logfire.info(f"Human feedback: {user_input}")
+    console.print()
 
-    seller_result = seller_agent.run_sync(
-        f"Buyer countered with: {our_offer.quantity} goats at ${our_offer.price} each. "
-        f"Terms: {our_offer.terms}. Their reasoning: {our_offer.reasoning}. "
-        f"Make your counteroffer."
+    # Agent takes feedback and negotiates with seller
+    for round_num in range(3):  # Up to 3 rounds of back-and-forth
+        logfire.info(f"Negotiation round {round_num + 1}")
+
+        agent_prompt = f"""
+Previous conversation:
+{conversation_history}
+
+Your client said: "{user_input}"
+
+Respond to the seller based on your client's feedback. Be natural and conversational.
+"""
+
+        negotiator_response = negotiator_agent.run_sync(agent_prompt)
+        logfire.info(f"Negotiator says: {negotiator_response.output[:100]}")
+
+        conversation_history += f"\n\nYou: {negotiator_response.output}"
+
+        # Seller responds
+        seller_response = seller_agent.run_sync(
+            f"Previous conversation:\n{conversation_history}\n\n"
+            f"The buyer said: {negotiator_response.output}\n\n"
+            f"Respond to their offer or counteroffer."
+        )
+
+        logfire.info(f"Seller responds: {seller_response.output[:100]}")
+        conversation_history += f"\n\nSeller: {seller_response.output}"
+
+    # After negotiation rounds, show update
+    console.print(
+        Panel(
+            Markdown(f"**Latest from seller:**\n\n{seller_response.output}"),
+            title="Seller's Response",
+            border_style="red",
+        )
     )
-    seller_offer = cast(Offer, seller_result.output)
-
-    display_offer("Seller's Counteroffer", seller_offer, "red")
-    logfire.info(f"Seller counters: {seller_offer.quantity} goats at ${seller_offer.price} each")
-
-else:
-    console.print("\n[bold red]❌ No deal reached after {max_rounds} rounds[/bold red]\n")
-    logfire.warn(f"Negotiation failed after {max_rounds} rounds")
