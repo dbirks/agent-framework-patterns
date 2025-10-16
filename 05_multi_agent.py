@@ -5,6 +5,7 @@
 #   "pydantic-ai==1.1.0",
 #   "python-dotenv==1.1.1",
 #   "ddgs==9.6.1",
+#   "rich==14.2.0",
 # ]
 # ///
 """
@@ -22,6 +23,10 @@ import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
+from rich.console import Console
+from rich.markdown import Markdown
+
+console = Console()
 
 load_dotenv(override=True)
 model = os.getenv("MODEL")
@@ -33,17 +38,20 @@ research_agent = Agent(
     "anthropic:claude-haiku-4-5",
     system_prompt="You're a research specialist. Search the web for factual, up-to-date information about topics. Use the search tool to gather current information.",
     tools=[duckduckgo_search_tool()],
+    instrument=True,
 )
 
 writing_agent = Agent(
     "openai:o4-mini",
-    system_prompt="You're a creative writer. Transform information into engaging, well-written content with clear structure and compelling narrative.",
+    system_prompt="You're a creative writer. Transform information into engaging, well-written markdown content with clear structure and compelling narrative.",
+    instrument=True,
 )
 
 # Create main coordinator agent
 coordinator = Agent(
     "anthropic:claude-haiku-4-5",
-    system_prompt="You're a coordinator that delegates tasks to specialist agents. Use research_topic to gather information, then write_content to create engaging content.",
+    system_prompt="You're a coordinator that delegates tasks to specialist agents. Use research_topic to gather information, then write_content to create engaging markdown content.",
+    instrument=True,
 )
 
 
@@ -51,7 +59,7 @@ coordinator = Agent(
 @coordinator.tool_plain
 def research_topic(topic: str) -> str:
     """Research a topic using the specialized research agent."""
-    print(f"📚 Research agent investigating: {topic}")
+    logfire.info(f"Research agent investigating: {topic}")
     result = research_agent.run_sync(f"Provide key facts about: {topic}")
     return result.output
 
@@ -60,15 +68,17 @@ def research_topic(topic: str) -> str:
 @coordinator.tool_plain
 def write_content(information: str, style: str = "engaging") -> str:
     """Write content using the specialized writing agent."""
-    print(f"✍️  Writing agent creating {style} content...")
-    result = writing_agent.run_sync(f"Write {style} content based on this information: {information}")
+    logfire.info(f"Writing agent creating {style} content")
+    result = writing_agent.run_sync(f"Write {style} markdown content based on this information: {information}")
     return result.output
 
 
-# Run the coordinator - it will delegate to sub-agents
-print("🎯 Agent Composition Demo")
-print("=" * 50)
+console.print("\n[bold cyan]Agent Composition Demo[/bold cyan]\n")
+
+logfire.info("Starting multi-agent workflow")
 result = coordinator.run_sync(
-    "I need an engaging article about quantum computing. First research it, then write compelling content."
+    "I need an engaging article about quantum computing. First research it, then write compelling markdown content."
 )
-print(f"\n✅ Final output:\n{result.output}")
+
+console.print(Markdown(result.output))
+console.print()
